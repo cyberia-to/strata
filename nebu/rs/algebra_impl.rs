@@ -1,7 +1,7 @@
 //! trait implementations for Goldilocks — all four tiers.
 
 use crate::field::{Goldilocks, P};
-use cyb_algebra::{Encode, Field, Ring, Semiring};
+use cyb_algebra::{Codec, Field, Ring, Semiring};
 use cyb_algebra_compute::{Bits, Spectral};
 use cyb_algebra_ext::Batch;
 use cyb_algebra_proof::{Dot, Reduce};
@@ -11,7 +11,7 @@ use alloc::vec::Vec;
 
 // ── tier 1: universal ────────────────────────────────────────────
 
-impl Encode for Goldilocks {
+impl Codec for Goldilocks {
     fn byte_len() -> usize {
         8
     }

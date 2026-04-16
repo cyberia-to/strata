@@ -4,7 +4,7 @@
 //!
 //! ## tiers
 //!
-//! - tier 1 (`cyb-algebra`): Encode, Semiring, Ring, Field
+//! - tier 1 (`cyb-algebra`): Codec, Semiring, Ring, Field
 //! - tier 2 (`cyb-algebra-proof`): Reduce, Dot
 //! - tier 3 (`cyb-algebra-compute`): Spectral, Bits
 //! - tier 4 (`cyb-algebra-ext`): Extension, Batch, Blind

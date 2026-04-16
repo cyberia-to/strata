@@ -58,7 +58,7 @@ use core::ops::{Add, AddAssign, Mul, MulAssign, Neg, Sub, SubAssign};
 
 /// serialize algebraic elements to and from bytes.
 /// every type in the algebra stack implements this.
-pub trait Encode: Sized {
+pub trait Codec: Sized {
     /// expected byte length of the serialized form.
     fn byte_len() -> usize;
     /// serialize to a byte buffer. buffer must be at least `byte_len()` bytes.

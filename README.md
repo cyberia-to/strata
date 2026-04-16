@@ -67,7 +67,7 @@ traits organized by who needs them — not by abstract algebra taxonomy:
 every algebra implements at least one level. hemera needs this tier only.
 
 ```rust
-use cyb_algebra::{Semiring, Ring, Field, Encode};
+use cyb_algebra::{Semiring, Ring, Field, Codec};
 ```
 
 **Semiring** — add and multiply with identities. the tropical semiring (min, +) lives
@@ -138,7 +138,7 @@ no branches on secret data.
 
 ## what each algebra implements
 
-| algebra | Encode | Semiring | Ring | Field | Reduce | Dot | Spectral | Bits | Extension | Batch | Blind |
+| algebra | Codec | Semiring | Ring | Field | Reduce | Dot | Spectral | Bits | Extension | Batch | Blind |
 |---------|--------|----------|------|-------|------------|-----|----------|------|-----------|-------|-------------|
 | nebu | yes | yes | yes | yes | yes | yes | yes | yes | — | yes | — |
 | kuro | yes | yes | yes | yes | yes | yes | — | — | — | yes | — |
@@ -235,7 +235,7 @@ assert_eq!((a * a.inv()), Fq::ONE);
 
 | crate | what |
 |-------|------|
-| [cyb-algebra](core/) | tier 1: Encode, Semiring, Ring, Field |
+| [cyb-algebra](core/) | tier 1: Codec, Semiring, Ring, Field |
 | [cyb-algebra-proof](proof/) | tier 2: Reduce, Dot |
 | [cyb-algebra-compute](compute/) | tier 3: Spectral, Bits |
 | [cyb-algebra-ext](ext/) | tier 4: Extension, Batch, Blind |

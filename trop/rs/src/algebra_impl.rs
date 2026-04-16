@@ -3,7 +3,7 @@
 
 use crate::element::Tropical;
 use core::ops::{Add, AddAssign, Mul, MulAssign};
-use cyb_algebra::{Encode, Semiring};
+use cyb_algebra::{Codec, Semiring};
 
 // ── std::ops (required by Semiring) ──────────────────────────────
 
@@ -39,7 +39,7 @@ impl MulAssign for Tropical {
 
 // ── tier 1 ───────────────────────────────────────────────────────
 
-impl Encode for Tropical {
+impl Codec for Tropical {
     fn byte_len() -> usize {
         8
     }

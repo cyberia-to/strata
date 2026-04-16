@@ -1,7 +1,7 @@
 //! trait implementations for Fq — tiers 1, 2, 4.
 
 use crate::fq::Fq;
-use cyb_algebra::{Encode, Field, Ring, Semiring};
+use cyb_algebra::{Codec, Field, Ring, Semiring};
 use cyb_algebra_ext::{Batch, Blind};
 use cyb_algebra_proof::{Dot, Reduce};
 
@@ -10,7 +10,7 @@ use alloc::vec::Vec;
 
 // ── tier 1 ───────────────────────────────────────────────────────
 
-impl Encode for Fq {
+impl Codec for Fq {
     fn byte_len() -> usize {
         64
     }

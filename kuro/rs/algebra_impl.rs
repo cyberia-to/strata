@@ -2,7 +2,7 @@
 //! in characteristic 2: sub = add = XOR, neg = identity.
 
 use crate::tower::F2_128;
-use cyb_algebra::{Encode, Field, Ring, Semiring};
+use cyb_algebra::{Codec, Field, Ring, Semiring};
 use cyb_algebra_ext::Batch;
 use cyb_algebra_proof::{Dot, Reduce};
 
@@ -11,7 +11,7 @@ use alloc::vec::Vec;
 
 // ── tier 1 ───────────────────────────────────────────────────────
 
-impl Encode for F2_128 {
+impl Codec for F2_128 {
     fn byte_len() -> usize {
         16
     }
