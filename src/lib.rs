@@ -5,7 +5,7 @@
 //! ## tiers
 //!
 //! - tier 1 (`cyb-algebra`): Encode, Semiring, Ring, Field
-//! - tier 2 (`cyb-algebra-proof`): Hash2Field, Fma
+//! - tier 2 (`cyb-algebra-proof`): Hash2Field, InnerProduct
 //! - tier 3 (`cyb-algebra-compute`): Spectral, Bits
 //! - tier 4 (`cyb-algebra-ext`): Extension, Batch, ConstantTime
 //!
@@ -21,7 +21,7 @@
 pub use cyb_algebra::*;
 
 // tier 2: proof system
-pub use cyb_algebra_proof::{Fma, Hash2Field};
+pub use cyb_algebra_proof::{InnerProduct, Hash2Field};
 
 // tier 3: computation
 pub use cyb_algebra_compute::{Bits, Spectral};

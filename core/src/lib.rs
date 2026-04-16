@@ -20,7 +20,7 @@
 //!
 //! ```text
 //! Hash2Field   from_hash(bytes) → element — Fiat-Shamir challenges
-//! Fma          sum_of_products — fused multiply-accumulate for constraint evaluation
+//! InnerProduct          inner_product — fused multiply-accumulate for constraint evaluation
 //! ```
 //!
 //! ## tier 3: computation (`cyb-algebra-compute`)
@@ -46,7 +46,7 @@
 //!
 //! | type | crate | tiers |
 //! |------|-------|-------|
-//! | Goldilocks | nebu | Field + Hash2Field + Fma + Spectral + Bits + Extension + Batch |
+//! | Goldilocks | nebu | Field + Hash2Field + InnerProduct + Spectral + Bits + Extension + Batch |
 //! | F₂¹²⁸ | kuro | Field + Hash2Field + Bits + Extension + Batch |
 //! | RingElement | jali | (uses Goldilocks for scalar ops) |
 //! | Tropical | trop | Semiring + Encode |

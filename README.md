@@ -53,7 +53,7 @@ traits organized by who needs them — not by abstract algebra taxonomy:
     from_hash        roots of         base, degree,
     (bytes→F)        unity, NTT       frobenius map
 
-  Fma              Bits             Batch
+  InnerProduct              Bits             Batch
     sum_of_          to_bits,         batch_inv
     products         from_bits        (Montgomery)
 
@@ -87,14 +87,14 @@ lens (polynomial commitment) and zheng (constraint verification) need this.
 hemera and nox don't.
 
 ```rust
-use cyb_algebra_proof::{Hash2Field, Fma};
+use cyb_algebra_proof::{Hash2Field, InnerProduct};
 ```
 
 **Hash2Field** — reduce hash output bytes to a field element. this is the bridge
 between hemera (which produces bytes) and field operations (which need elements).
 every Fiat-Shamir challenge in the stack goes through this trait.
 
-**Fma** — fused multiply-accumulate: Σ aᵢ·bᵢ. zheng evaluates CCS constraints
+**InnerProduct** — fused multiply-accumulate: Σ aᵢ·bᵢ. zheng evaluates CCS constraints
 as matrix-vector products over field elements. the default implementation is a
 loop; algebras can override with hardware FMA or delayed modular reduction.
 
@@ -138,7 +138,7 @@ no branches on secret data.
 
 ## what each algebra implements
 
-| algebra | Encode | Semiring | Ring | Field | Hash2Field | Fma | Spectral | Bits | Extension | Batch | ConstantTime |
+| algebra | Encode | Semiring | Ring | Field | Hash2Field | InnerProduct | Spectral | Bits | Extension | Batch | ConstantTime |
 |---------|--------|----------|------|-------|------------|-----|----------|------|-----------|-------|-------------|
 | nebu | yes | yes | yes | yes | yes | yes | yes | yes | — | yes | — |
 | kuro | yes | yes | yes | yes | yes | yes | — | — | — | yes | — |
@@ -236,7 +236,7 @@ assert_eq!((a * a.inv()), Fq::ONE);
 | crate | what |
 |-------|------|
 | [cyb-algebra](core/) | tier 1: Encode, Semiring, Ring, Field |
-| [cyb-algebra-proof](proof/) | tier 2: Hash2Field, Fma |
+| [cyb-algebra-proof](proof/) | tier 2: Hash2Field, InnerProduct |
 | [cyb-algebra-compute](compute/) | tier 3: Spectral, Bits |
 | [cyb-algebra-ext](ext/) | tier 4: Extension, Batch, ConstantTime |
 | [cyb-nebu](nebu/rs/) | Goldilocks F_p (73 tests) |
@@ -272,7 +272,7 @@ cyb-nebu = "0.1"
 | [[hemera]] | 1 (Field) | Poseidon2 hash: add, mul, pow7, inv over Goldilocks |
 | [[lens]] | 1 + 2 (Field + Hash2Field) | commit: encode + hash. open: Fiat-Shamir challenges |
 | [[nox]] | 1 + 3 (Field + Spectral + Bits) | VM registers, NTT jets, comparison, bit ops |
-| [[zheng]] | 1 + 2 (Field + Hash2Field + Fma) | constraint evaluation, Fiat-Shamir, matrix products |
+| [[zheng]] | 1 + 2 (Field + Hash2Field + InnerProduct) | constraint evaluation, Fiat-Shamir, matrix products |
 | [[bbg]] | 1 (Field + Encode) | state polynomial serialization |
 | [[mudra]] | 1 + 4 (Field + ConstantTime) | CSIDH key exchange, threshold protocols |
 
@@ -281,7 +281,7 @@ cyb-nebu = "0.1"
 ```
 algebra/
 ├── core/           cyb-algebra           Semiring → Ring → Field + Encode
-├── proof/          cyb-algebra-proof     Hash2Field + Fma
+├── proof/          cyb-algebra-proof     Hash2Field + InnerProduct
 ├── compute/        cyb-algebra-compute   Spectral + Bits
 ├── ext/            cyb-algebra-ext       Extension + Batch + ConstantTime
 ├── src/            cyber-algebra         facade

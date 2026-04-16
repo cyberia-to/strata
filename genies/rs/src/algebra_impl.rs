@@ -3,7 +3,7 @@
 use crate::fq::Fq;
 use cyb_algebra::{Encode, Field, Ring, Semiring};
 use cyb_algebra_ext::{Batch, ConstantTime};
-use cyb_algebra_proof::{Fma, Hash2Field};
+use cyb_algebra_proof::{InnerProduct, Hash2Field};
 
 extern crate alloc;
 use alloc::vec::Vec;
@@ -66,7 +66,7 @@ impl Hash2Field for Fq {
     }
 }
 
-impl Fma for Fq {}
+impl InnerProduct for Fq {}
 
 // ── tier 4 ───────────────────────────────────────────────────────
 

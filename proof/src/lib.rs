@@ -10,12 +10,13 @@
 //! hemera (which produces bytes) and field operations (which need elements).
 //! used for Fiat-Shamir challenges in lens and zheng.
 //!
-//! ## Fma
+//! ## InnerProduct
 //!
-//! fused multiply-accumulate: compute Σ aᵢ·bᵢ efficiently.
-//! zheng uses this for CCS constraint evaluation (matrix-vector products
-//! over field elements). a naive loop does N multiplies + N additions.
-//! fma can exploit CPU/GPU fused operations or delayed reduction.
+//! compute the inner product Σ aᵢ·bᵢ of two field element vectors.
+//! zheng uses this for CCS constraint evaluation (matrix-vector products).
+//! lens uses it for multilinear polynomial evaluation.
+//! algebras can override the default loop with hardware FMA, delayed
+//! modular reduction, or vectorized operations.
 
 use cyb_algebra::Field;
 
@@ -35,17 +36,25 @@ pub trait Hash2Field: Field {
     fn from_hash(bytes: &[u8]) -> Self;
 }
 
-/// fused multiply-accumulate: Σ aᵢ·bᵢ.
+/// inner product of two field element vectors: Σ aᵢ·bᵢ.
 ///
-/// default implementation is a simple loop. algebras can override with
-/// hardware fma, delayed reduction, or vectorized operations.
+/// the fundamental operation for constraint evaluation and polynomial
+/// evaluation. given vectors a = [a₀, a₁, ...] and b = [b₀, b₁, ...],
+/// computes a₀·b₀ + a₁·b₁ + ... + aₙ·bₙ.
 ///
-/// zheng constraint evaluation: Σ constraint_coeff[i] · witness[i].
-/// lens multilinear evaluation: Σ eval[i] · basis[i].
-pub trait Fma: Field {
+/// default implementation is a simple loop. algebras can override with:
+/// - hardware FMA (fused multiply-add, avoids intermediate rounding)
+/// - delayed modular reduction (accumulate in wider integer, reduce once)
+/// - SIMD vectorization (process 4-8 products in parallel)
+///
+/// consumers:
+/// - zheng: Σ constraint_coeff[i] · witness[i] (CCS evaluation)
+/// - lens: Σ eval[i] · basis[i] (multilinear extension evaluation)
+/// - nox: Σ weight[i] · value[i] (linear combination jets)
+pub trait InnerProduct: Field {
     /// compute a[0]*b[0] + a[1]*b[1] + ... + a[n-1]*b[n-1].
-    /// slices must be the same length.
-    fn sum_of_products(a: &[Self], b: &[Self]) -> Self {
+    /// panics if slices differ in length.
+    fn inner_product(a: &[Self], b: &[Self]) -> Self {
         assert_eq!(a.len(), b.len());
         let mut acc = Self::ZERO;
         for (&ai, &bi) in a.iter().zip(b.iter()) {
