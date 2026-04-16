@@ -4,7 +4,7 @@
 use crate::tower::F2_128;
 use cyb_algebra::{Encode, Field, Ring, Semiring};
 use cyb_algebra_ext::Batch;
-use cyb_algebra_proof::{InnerProduct, Hash2Field};
+use cyb_algebra_proof::{Dot, Hash2Field};
 
 extern crate alloc;
 use alloc::vec::Vec;
@@ -57,7 +57,7 @@ impl Hash2Field for F2_128 {
     }
 }
 
-impl InnerProduct for F2_128 {}
+impl Dot for F2_128 {}
 
 // ── tier 4 ───────────────────────────────────────────────────────
 

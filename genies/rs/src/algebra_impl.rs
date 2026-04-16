@@ -2,8 +2,8 @@
 
 use crate::fq::Fq;
 use cyb_algebra::{Encode, Field, Ring, Semiring};
-use cyb_algebra_ext::{Batch, ConstantTime};
-use cyb_algebra_proof::{InnerProduct, Hash2Field};
+use cyb_algebra_ext::{Batch, Blind};
+use cyb_algebra_proof::{Dot, Hash2Field};
 
 extern crate alloc;
 use alloc::vec::Vec;
@@ -66,7 +66,7 @@ impl Hash2Field for Fq {
     }
 }
 
-impl InnerProduct for Fq {}
+impl Dot for Fq {}
 
 // ── tier 4 ───────────────────────────────────────────────────────
 
@@ -104,7 +104,7 @@ impl Batch for Fq {
     }
 }
 
-impl ConstantTime for Fq {
+impl Blind for Fq {
     fn ct_eq(&self, other: &Self) -> bool {
         // constant-time: OR all limb XOR differences
         let mut diff = 0u64;

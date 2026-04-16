@@ -15,7 +15,7 @@
 //! multiplications. nebu and kuro both implement this independently —
 //! this trait unifies the interface.
 //!
-//! ## ConstantTime
+//! ## Blind
 //!
 //! timing-safe operations for privacy-critical code. genies (CSIDH)
 //! requires constant-time arithmetic — no branches on secret data.
@@ -68,7 +68,7 @@ pub trait Batch: Field {
 /// genies (CSIDH) requires this: isogeny walks on secret exponents
 /// must not leak timing information. no branches on secret data,
 /// no variable-time memory access, no early exits.
-pub trait ConstantTime: Field {
+pub trait Blind: Field {
     /// constant-time equality comparison.
     fn ct_eq(&self, other: &Self) -> bool;
 

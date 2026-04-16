@@ -53,11 +53,11 @@ traits organized by who needs them — not by abstract algebra taxonomy:
     from_hash        roots of         base, degree,
     (bytes→F)        unity, NTT       frobenius map
 
-  InnerProduct              Bits             Batch
+  Dot              Bits             Batch
     sum_of_          to_bits,         batch_inv
     products         from_bits        (Montgomery)
 
-                                    ConstantTime
+                                    Blind
                                       ct_eq, ct_select,
                                       ct_swap
 ```
@@ -87,14 +87,14 @@ lens (polynomial commitment) and zheng (constraint verification) need this.
 hemera and nox don't.
 
 ```rust
-use cyb_algebra_proof::{Hash2Field, InnerProduct};
+use cyb_algebra_proof::{Hash2Field, Dot};
 ```
 
 **Hash2Field** — reduce hash output bytes to a field element. this is the bridge
 between hemera (which produces bytes) and field operations (which need elements).
 every Fiat-Shamir challenge in the stack goes through this trait.
 
-**InnerProduct** — fused multiply-accumulate: Σ aᵢ·bᵢ. zheng evaluates CCS constraints
+**Dot** — fused multiply-accumulate: Σ aᵢ·bᵢ. zheng evaluates CCS constraints
 as matrix-vector products over field elements. the default implementation is a
 loop; algebras can override with hardware FMA or delayed modular reduction.
 
@@ -122,7 +122,7 @@ comparison (lt), shifts, and masks. Binius (lens) uses it for binary constraint 
 specific algebraic structures that not every algebra needs.
 
 ```rust
-use cyb_algebra_ext::{Extension, Batch, ConstantTime};
+use cyb_algebra_ext::{Extension, Batch, Blind};
 ```
 
 **Extension\<Base\>** — tower fields. Fp2, Fp3, Fp4 over Goldilocks (nebu extensions).
@@ -132,13 +132,13 @@ a degree, and a Frobenius endomorphism.
 **Batch** — Montgomery's trick: invert N elements with 1 inversion + 3(N-1)
 multiplications. nebu, kuro, and genies all implement this.
 
-**ConstantTime** — timing-safe operations. genies (CSIDH) requires this: isogeny walks
+**Blind** — timing-safe operations. genies (CSIDH) requires this: isogeny walks
 on secret exponents must not leak timing information. ct_eq, ct_select, ct_swap —
 no branches on secret data.
 
 ## what each algebra implements
 
-| algebra | Encode | Semiring | Ring | Field | Hash2Field | InnerProduct | Spectral | Bits | Extension | Batch | ConstantTime |
+| algebra | Encode | Semiring | Ring | Field | Hash2Field | Dot | Spectral | Bits | Extension | Batch | Blind |
 |---------|--------|----------|------|-------|------------|-----|----------|------|-----------|-------|-------------|
 | nebu | yes | yes | yes | yes | yes | yes | yes | yes | — | yes | — |
 | kuro | yes | yes | yes | yes | yes | yes | — | — | — | yes | — |
@@ -236,9 +236,9 @@ assert_eq!((a * a.inv()), Fq::ONE);
 | crate | what |
 |-------|------|
 | [cyb-algebra](core/) | tier 1: Encode, Semiring, Ring, Field |
-| [cyb-algebra-proof](proof/) | tier 2: Hash2Field, InnerProduct |
+| [cyb-algebra-proof](proof/) | tier 2: Hash2Field, Dot |
 | [cyb-algebra-compute](compute/) | tier 3: Spectral, Bits |
-| [cyb-algebra-ext](ext/) | tier 4: Extension, Batch, ConstantTime |
+| [cyb-algebra-ext](ext/) | tier 4: Extension, Batch, Blind |
 | [cyb-nebu](nebu/rs/) | Goldilocks F_p (73 tests) |
 | [cyb-kuro](kuro/rs/) | F₂ binary tower (77 tests) |
 | [cyb-jali](jali/rs/) | polynomial ring R_q (70 tests) |
@@ -272,18 +272,18 @@ cyb-nebu = "0.1"
 | [[hemera]] | 1 (Field) | Poseidon2 hash: add, mul, pow7, inv over Goldilocks |
 | [[lens]] | 1 + 2 (Field + Hash2Field) | commit: encode + hash. open: Fiat-Shamir challenges |
 | [[nox]] | 1 + 3 (Field + Spectral + Bits) | VM registers, NTT jets, comparison, bit ops |
-| [[zheng]] | 1 + 2 (Field + Hash2Field + InnerProduct) | constraint evaluation, Fiat-Shamir, matrix products |
+| [[zheng]] | 1 + 2 (Field + Hash2Field + Dot) | constraint evaluation, Fiat-Shamir, matrix products |
 | [[bbg]] | 1 (Field + Encode) | state polynomial serialization |
-| [[mudra]] | 1 + 4 (Field + ConstantTime) | CSIDH key exchange, threshold protocols |
+| [[mudra]] | 1 + 4 (Field + Blind) | CSIDH key exchange, threshold protocols |
 
 ## workspace
 
 ```
 algebra/
 ├── core/           cyb-algebra           Semiring → Ring → Field + Encode
-├── proof/          cyb-algebra-proof     Hash2Field + InnerProduct
+├── proof/          cyb-algebra-proof     Hash2Field + Dot
 ├── compute/        cyb-algebra-compute   Spectral + Bits
-├── ext/            cyb-algebra-ext       Extension + Batch + ConstantTime
+├── ext/            cyb-algebra-ext       Extension + Batch + Blind
 ├── src/            cyber-algebra         facade
 ├── nebu/           Goldilocks F_p
 │   ├── rs/         core (73 tests)

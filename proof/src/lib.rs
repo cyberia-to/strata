@@ -10,7 +10,7 @@
 //! hemera (which produces bytes) and field operations (which need elements).
 //! used for Fiat-Shamir challenges in lens and zheng.
 //!
-//! ## InnerProduct
+//! ## Dot
 //!
 //! compute the inner product Σ aᵢ·bᵢ of two field element vectors.
 //! zheng uses this for CCS constraint evaluation (matrix-vector products).
@@ -51,10 +51,10 @@ pub trait Hash2Field: Field {
 /// - zheng: Σ constraint_coeff[i] · witness[i] (CCS evaluation)
 /// - lens: Σ eval[i] · basis[i] (multilinear extension evaluation)
 /// - nox: Σ weight[i] · value[i] (linear combination jets)
-pub trait InnerProduct: Field {
+pub trait Dot: Field {
     /// compute a[0]*b[0] + a[1]*b[1] + ... + a[n-1]*b[n-1].
     /// panics if slices differ in length.
-    fn inner_product(a: &[Self], b: &[Self]) -> Self {
+    fn dot(a: &[Self], b: &[Self]) -> Self {
         assert_eq!(a.len(), b.len());
         let mut acc = Self::ZERO;
         for (&ai, &bi) in a.iter().zip(b.iter()) {

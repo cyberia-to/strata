@@ -20,7 +20,7 @@
 //!
 //! ```text
 //! Hash2Field   from_hash(bytes) → element — Fiat-Shamir challenges
-//! InnerProduct          inner_product — fused multiply-accumulate for constraint evaluation
+//! Dot          dot — fused multiply-accumulate for constraint evaluation
 //! ```
 //!
 //! ## tier 3: computation (`cyb-algebra-compute`)
@@ -39,18 +39,18 @@
 //! ```text
 //! Extension<Base>   base field, degree, frobenius — tower fields
 //! Batch             batch_inv — Montgomery's trick
-//! ConstantTime      ct_eq, ct_select — timing-safe operations
+//! Blind      ct_eq, ct_select — timing-safe operations
 //! ```
 //!
 //! ## the five algebras
 //!
 //! | type | crate | tiers |
 //! |------|-------|-------|
-//! | Goldilocks | nebu | Field + Hash2Field + InnerProduct + Spectral + Bits + Extension + Batch |
+//! | Goldilocks | nebu | Field + Hash2Field + Dot + Spectral + Bits + Extension + Batch |
 //! | F₂¹²⁸ | kuro | Field + Hash2Field + Bits + Extension + Batch |
 //! | RingElement | jali | (uses Goldilocks for scalar ops) |
 //! | Tropical | trop | Semiring + Encode |
-//! | Fq | genies | Field + Hash2Field + Batch + ConstantTime |
+//! | Fq | genies | Field + Hash2Field + Batch + Blind |
 
 use core::ops::{Add, AddAssign, Mul, MulAssign, Neg, Sub, SubAssign};
 

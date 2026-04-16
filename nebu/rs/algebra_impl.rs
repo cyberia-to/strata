@@ -4,7 +4,7 @@ use crate::field::{Goldilocks, P};
 use cyb_algebra::{Encode, Field, Ring, Semiring};
 use cyb_algebra_compute::{Bits, Spectral};
 use cyb_algebra_ext::Batch;
-use cyb_algebra_proof::{InnerProduct, Hash2Field};
+use cyb_algebra_proof::{Dot, Hash2Field};
 
 extern crate alloc;
 use alloc::vec::Vec;
@@ -57,7 +57,7 @@ impl Hash2Field for Goldilocks {
     }
 }
 
-impl InnerProduct for Goldilocks {}
+impl Dot for Goldilocks {}
 
 // ── tier 3: compute ──────────────────────────────────────────────
 
