@@ -1,9 +1,10 @@
-use criterion::{black_box, criterion_group, criterion_main, Criterion};
+use criterion::{Criterion, black_box, criterion_group, criterion_main};
 use nebu::field::Goldilocks;
 use nebu::ntt;
 use nebu::sqrt;
 use strata_core::Field;
 use strata_ext::Batch;
+use strata_proof::Dot;
 
 fn bench_add(c: &mut Criterion) {
     let a = Goldilocks::new(0xDEAD_BEEF_CAFE_BABE);
@@ -30,9 +31,7 @@ fn bench_square(c: &mut Criterion) {
 
 fn bench_inv(c: &mut Criterion) {
     let a = Goldilocks::new(0xDEAD_BEEF_CAFE_BABE);
-    c.bench_function("Goldilocks::inv", |bench| {
-        bench.iter(|| black_box(a).inv())
-    });
+    c.bench_function("Goldilocks::inv", |bench| bench.iter(|| black_box(a).inv()));
 }
 
 fn bench_pow7(c: &mut Criterion) {
@@ -79,6 +78,14 @@ fn bench_batch_inv_1000(c: &mut Criterion) {
     });
 }
 
+fn bench_dot_1000(c: &mut Criterion) {
+    let a: Vec<Goldilocks> = (0..1000).map(|i| Goldilocks::new(i * 7 + 3)).collect();
+    let b: Vec<Goldilocks> = (0..1000).map(|i| Goldilocks::new(i * 11 + 5)).collect();
+    c.bench_function("Dot::dot 1000", |bench| {
+        bench.iter(|| Goldilocks::dot(black_box(&a), black_box(&b)))
+    });
+}
+
 criterion_group!(
     benches,
     bench_add,
@@ -90,5 +97,6 @@ criterion_group!(
     bench_ntt_1024,
     bench_ntt_4096,
     bench_batch_inv_1000,
+    bench_dot_1000,
 );
 criterion_main!(benches);
