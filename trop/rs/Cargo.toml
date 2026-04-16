@@ -16,7 +16,7 @@ name = "trop"
 path = "src/lib.rs"
 
 [dependencies]
-cyb-algebra.workspace = true
+strata-core.workspace = true
 
 [dev-dependencies]
 criterion.workspace = true

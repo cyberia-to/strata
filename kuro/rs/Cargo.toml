@@ -16,9 +16,9 @@ name = "kuro"
 path = "lib.rs"
 
 [dependencies]
-cyb-algebra.workspace = true
-cyb-algebra-proof.workspace = true
-cyb-algebra-ext.workspace = true
+strata-core.workspace = true
+strata-proof.workspace = true
+strata-ext.workspace = true
 
 [dev-dependencies]
 criterion.workspace = true

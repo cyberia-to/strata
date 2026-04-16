@@ -1,10 +1,10 @@
 //! trait implementations for Goldilocks — all four tiers.
 
 use crate::field::{Goldilocks, P};
-use cyb_algebra::{Codec, Field, Ring, Semiring};
-use cyb_algebra_compute::{Bits, Spectral};
-use cyb_algebra_ext::Batch;
-use cyb_algebra_proof::{Dot, Reduce};
+use strata_core::{Codec, Field, Ring, Semiring};
+use strata_compute::{Bits, Spectral};
+use strata_ext::Batch;
+use strata_proof::{Dot, Reduce};
 
 extern crate alloc;
 use alloc::vec::Vec;

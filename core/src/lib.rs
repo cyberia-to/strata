@@ -1,5 +1,5 @@
 #![no_std]
-//! cyb-algebra — algebraic trait hierarchy for verifiable computation.
+//! strata-core — algebraic trait hierarchy for verifiable computation.
 //!
 //! four tiers of traits organized by consumer need:
 //!
@@ -14,7 +14,7 @@
 //! Field      + inv — finite fields live here
 //! ```
 //!
-//! ## tier 2: proof system (`cyb-algebra-proof`)
+//! ## tier 2: proof system (`strata-proof`)
 //!
 //! traits needed by lens (commitment) and zheng (verification).
 //!
@@ -23,7 +23,7 @@
 //! Dot          dot — fused multiply-accumulate for constraint evaluation
 //! ```
 //!
-//! ## tier 3: computation (`cyb-algebra-compute`)
+//! ## tier 3: computation (`strata-compute`)
 //!
 //! traits needed by nox (execution) and jali (ring arithmetic).
 //!
@@ -32,7 +32,7 @@
 //! Bits       to_bits, from_bits — bit decomposition for binary operations
 //! ```
 //!
-//! ## tier 4: structure (`cyb-algebra-ext`)
+//! ## tier 4: structure (`strata-ext`)
 //!
 //! traits for specific algebraic structures.
 //!

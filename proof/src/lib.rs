@@ -1,5 +1,5 @@
 #![no_std]
-//! cyb-algebra-proof — tier 2: proof system traits.
+//! strata-proof — tier 2: proof system traits.
 //!
 //! traits needed by lens (polynomial commitment) and zheng (constraint verification).
 //! consumers that only do field arithmetic (hemera) don't need this tier.
@@ -18,7 +18,7 @@
 //! algebras can override the default loop with hardware FMA, delayed
 //! modular reduction, or vectorized operations.
 
-use cyb_algebra::Field;
+use strata_core::Field;
 
 /// derive a field element from arbitrary bytes.
 ///

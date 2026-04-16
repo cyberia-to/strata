@@ -1,5 +1,5 @@
 #![no_std]
-//! cyb-algebra-ext — tier 4: structural traits.
+//! strata-ext — tier 4: structural traits.
 //!
 //! traits for specific algebraic structures that not every field needs.
 //!
@@ -21,7 +21,7 @@
 //! requires constant-time arithmetic — no branches on secret data.
 //! other algebras may implement this for defense in depth.
 
-use cyb_algebra::Field;
+use strata_core::Field;
 
 /// an extension field over a base field.
 ///

@@ -1,5 +1,5 @@
 [package]
-name = "cyber-algebra"
+name = "strata"
 version.workspace = true
 edition.workspace = true
 license-file = "../LICENSE"
@@ -11,14 +11,14 @@ categories = ["cryptography", "mathematics"]
 readme = "../README.md"
 
 [lib]
-name = "algebra"
+name = "strata"
 path = "lib.rs"
 
 [dependencies]
-cyb-algebra.workspace = true
-cyb-algebra-proof.workspace = true
-cyb-algebra-compute.workspace = true
-cyb-algebra-ext.workspace = true
+strata-core.workspace = true
+strata-proof.workspace = true
+strata-compute.workspace = true
+strata-ext.workspace = true
 nebu.workspace = true
 kuro.workspace = true
 jali.workspace = true

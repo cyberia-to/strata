@@ -1,9 +1,9 @@
 //! trait implementations for Fq — tiers 1, 2, 4.
 
 use crate::fq::Fq;
-use cyb_algebra::{Codec, Field, Ring, Semiring};
-use cyb_algebra_ext::{Batch, Blind};
-use cyb_algebra_proof::{Dot, Reduce};
+use strata_core::{Codec, Field, Ring, Semiring};
+use strata_ext::{Batch, Blind};
+use strata_proof::{Dot, Reduce};
 
 extern crate alloc;
 use alloc::vec::Vec;

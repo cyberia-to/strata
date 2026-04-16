@@ -3,7 +3,7 @@
 
 use crate::element::Tropical;
 use core::ops::{Add, AddAssign, Mul, MulAssign};
-use cyb_algebra::{Codec, Semiring};
+use strata_core::{Codec, Semiring};
 
 // ── std::ops (required by Semiring) ──────────────────────────────
 

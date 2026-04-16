@@ -1,13 +1,13 @@
-//! cyber-algebra — five algebraic backends for verifiable computation.
+//! strata — five algebraic backends for verifiable computation.
 //!
 //! re-exports the four-tier trait hierarchy and all five algebras.
 //!
 //! ## tiers
 //!
-//! - tier 1 (`cyb-algebra`): Codec, Semiring, Ring, Field
-//! - tier 2 (`cyb-algebra-proof`): Reduce, Dot
-//! - tier 3 (`cyb-algebra-compute`): Spectral, Bits
-//! - tier 4 (`cyb-algebra-ext`): Extension, Batch, Blind
+//! - tier 1 (`strata-core`): Codec, Semiring, Ring, Field
+//! - tier 2 (`strata-proof`): Reduce, Dot
+//! - tier 3 (`strata-compute`): Spectral, Bits
+//! - tier 4 (`strata-ext`): Extension, Batch, Blind
 //!
 //! ## algebras
 //!
@@ -18,16 +18,16 @@
 //! - `genies`: isogeny curves F_q (tiers 1, 2, 4)
 
 // tier 1: universal
-pub use cyb_algebra::*;
+pub use strata_core::*;
 
 // tier 2: proof system
-pub use cyb_algebra_proof::{Dot, Reduce};
+pub use strata_proof::{Dot, Reduce};
 
 // tier 3: computation
-pub use cyb_algebra_compute::{Bits, Spectral};
+pub use strata_compute::{Bits, Spectral};
 
 // tier 4: structure
-pub use cyb_algebra_ext::{Batch, Blind, Extension};
+pub use strata_ext::{Batch, Blind, Extension};
 
 // algebras
 pub use genies;

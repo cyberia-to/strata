@@ -1,5 +1,5 @@
 [package]
-name = "cyb-algebra-ext"
+name = "strata-ext"
 version.workspace = true
 edition.workspace = true
 license-file = "../LICENSE"
@@ -10,4 +10,4 @@ keywords = ["algebra", "extension-field", "batch", "constant-time"]
 categories = ["cryptography"]
 
 [dependencies]
-cyb-algebra.workspace = true
+strata-core.workspace = true

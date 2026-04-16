@@ -1,5 +1,5 @@
 [package]
-name = "cyb-algebra-compute"
+name = "strata-compute"
 version.workspace = true
 edition.workspace = true
 license-file = "../LICENSE"
@@ -10,4 +10,4 @@ keywords = ["algebra", "ntt", "fft", "spectral", "crypto"]
 categories = ["cryptography"]
 
 [dependencies]
-cyb-algebra.workspace = true
+strata-core.workspace = true

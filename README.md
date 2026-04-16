@@ -33,7 +33,7 @@ traits organized by who needs them — not by abstract algebra taxonomy:
 
 ```
 ┌──────────────────────────────────────────────────────┐
-│              TIER 1: universal (cyb-algebra)          │
+│              TIER 1: universal (strata-core)          │
 │                                                      │
 │  Encode      encode, decode                    │
 │  Semiring    add, mul, zero, one          ← trop     │
@@ -46,7 +46,7 @@ traits organized by who needs them — not by abstract algebra taxonomy:
        ┌────────────────┼────────────────┐
        │                │                │
   TIER 2: proofs   TIER 3: compute  TIER 4: structure
-  (cyb-algebra-    (cyb-algebra-    (cyb-algebra-
+  (strata-core-    (strata-core-    (strata-core-
    proof)           compute)         ext)
 
   Reduce       Spectral         Extension<Base>
@@ -67,7 +67,7 @@ traits organized by who needs them — not by abstract algebra taxonomy:
 every algebra implements at least one level. hemera needs this tier only.
 
 ```rust
-use cyb_algebra::{Semiring, Ring, Field, Codec};
+use strata_core::{Semiring, Ring, Field, Codec};
 ```
 
 **Semiring** — add and multiply with identities. the tropical semiring (min, +) lives
@@ -87,7 +87,7 @@ lens (polynomial commitment) and zheng (constraint verification) need this.
 hemera and nox don't.
 
 ```rust
-use cyb_algebra_proof::{Reduce, Dot};
+use strata_proof::{Reduce, Dot};
 ```
 
 **Reduce** — reduce hash output bytes to a field element. this is the bridge
@@ -103,7 +103,7 @@ loop; algebras can override with hardware FMA or delayed modular reduction.
 nox (VM execution) and jali (ring arithmetic) need this.
 
 ```rust
-use cyb_algebra_compute::{Spectral, Bits};
+use strata_compute::{Spectral, Bits};
 ```
 
 **Spectral** — a field with roots of unity. the spectral domain (NTT evaluation domain)
@@ -122,7 +122,7 @@ comparison (lt), shifts, and masks. Binius (lens) uses it for binary constraint 
 specific algebraic structures that not every algebra needs.
 
 ```rust
-use cyb_algebra_ext::{Extension, Batch, Blind};
+use strata_ext::{Extension, Batch, Blind};
 ```
 
 **Extension\<Base\>** — tower fields. Fp2, Fp3, Fp4 over Goldilocks (nebu extensions).
@@ -158,7 +158,7 @@ p = 2^64 - 2^32 + 1. reduction is two shifts and an add. 4-5 cycle multiply.
 
 ```rust
 use nebu::Goldilocks;
-use cyb_algebra::Field;
+use strata_core::Field;
 
 let a = Goldilocks::new(42);
 let b = a.inv();
@@ -204,7 +204,7 @@ Viterbi, Kantorovich.
 
 ```rust
 use trop::Tropical;
-use cyb_algebra::Semiring;
+use strata_core::Semiring;
 
 let a = Tropical::from_u64(3);
 let b = Tropical::from_u64(7);
@@ -223,7 +223,7 @@ constant-time.
 
 ```rust
 use genies::Fq;
-use cyb_algebra::Field;
+use strata_core::Field;
 
 let a = Fq::from_u64(42);
 assert_eq!((a * a.inv()), Fq::ONE);
@@ -235,30 +235,30 @@ assert_eq!((a * a.inv()), Fq::ONE);
 
 | crate | what |
 |-------|------|
-| [cyb-algebra](core/) | tier 1: Codec, Semiring, Ring, Field |
-| [cyb-algebra-proof](proof/) | tier 2: Reduce, Dot |
-| [cyb-algebra-compute](compute/) | tier 3: Spectral, Bits |
-| [cyb-algebra-ext](ext/) | tier 4: Extension, Batch, Blind |
+| [strata-core](core/) | tier 1: Codec, Semiring, Ring, Field |
+| [strata-proof](proof/) | tier 2: Reduce, Dot |
+| [strata-compute](compute/) | tier 3: Spectral, Bits |
+| [strata-ext](ext/) | tier 4: Extension, Batch, Blind |
 | [cyb-nebu](nebu/rs/) | Goldilocks F_p (73 tests) |
 | [cyb-kuro](kuro/rs/) | F₂ binary tower (77 tests) |
 | [cyb-jali](jali/rs/) | polynomial ring R_q (70 tests) |
 | [cyb-trop](trop/rs/) | tropical semiring (77 tests) |
 | [cyb-genies](genies/rs/) | isogeny curves F_q (55 tests) |
-| [cyber-algebra](src/) | facade: re-exports everything |
+| [strata](src/) | facade: re-exports everything |
 
 ```toml
 # everything
 [dependencies]
-cyber-algebra = "0.1"
+strata = "0.1"
 
 # just the traits (for libraries generic over Field)
 [dependencies]
-cyb-algebra = "0.1"
+strata-core = "0.1"
 
 # traits + proof tier (for lens, zheng)
 [dependencies]
-cyb-algebra = "0.1"
-cyb-algebra-proof = "0.1"
+strata-core = "0.1"
+strata-proof = "0.1"
 
 # one specific algebra
 [dependencies]
@@ -280,11 +280,11 @@ cyb-nebu = "0.1"
 
 ```
 algebra/
-├── core/           cyb-algebra           Semiring → Ring → Field + Encode
-├── proof/          cyb-algebra-proof     Reduce + Dot
-├── compute/        cyb-algebra-compute   Spectral + Bits
-├── ext/            cyb-algebra-ext       Extension + Batch + Blind
-├── src/            cyber-algebra         facade
+├── core/           strata-core           Semiring → Ring → Field + Encode
+├── proof/          strata-proof     Reduce + Dot
+├── compute/        strata-compute   Spectral + Bits
+├── ext/            strata-ext       Extension + Batch + Blind
+├── src/            strata         facade
 ├── nebu/           Goldilocks F_p
 │   ├── rs/         core (73 tests)
 │   ├── wgsl/       GPU compute shaders

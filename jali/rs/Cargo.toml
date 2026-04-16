@@ -21,7 +21,7 @@ name = "jali"
 path = "src/lib.rs"
 
 [dependencies]
-cyb-algebra.workspace = true
+strata-core.workspace = true
 nebu.workspace = true
 
 [dev-dependencies]

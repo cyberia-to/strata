@@ -2,9 +2,9 @@
 //! in characteristic 2: sub = add = XOR, neg = identity.
 
 use crate::tower::F2_128;
-use cyb_algebra::{Codec, Field, Ring, Semiring};
-use cyb_algebra_ext::Batch;
-use cyb_algebra_proof::{Dot, Reduce};
+use strata_core::{Codec, Field, Ring, Semiring};
+use strata_ext::Batch;
+use strata_proof::{Dot, Reduce};
 
 extern crate alloc;
 use alloc::vec::Vec;

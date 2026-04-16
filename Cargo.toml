@@ -14,15 +14,15 @@ members = [
 version = "0.1.0"
 edition = "2024"
 license-file = "LICENSE"
-repository = "https://github.com/cyberia-to/algebra"
+repository = "https://github.com/cyberia-to/strata"
 rust-version = "1.89"
 
 [workspace.dependencies]
 # tier crates
-cyb-algebra = { path = "core" }
-cyb-algebra-proof = { path = "proof" }
-cyb-algebra-compute = { path = "compute" }
-cyb-algebra-ext = { path = "ext" }
+strata-core = { path = "core" }
+strata-proof = { path = "proof" }
+strata-compute = { path = "compute" }
+strata-ext = { path = "ext" }
 
 # algebra crates
 nebu = { version = "0.1.0", path = "nebu/rs", package = "cyb-nebu" }

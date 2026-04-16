@@ -1,5 +1,5 @@
 #![no_std]
-//! cyb-algebra-compute — tier 3: computation traits.
+//! strata-compute — tier 3: computation traits.
 //!
 //! traits needed by nox (VM execution) and jali (ring arithmetic).
 //! these represent computational capabilities beyond basic arithmetic.
@@ -25,7 +25,7 @@
 //! nox uses this for binary operations (comparison, shifts, masks).
 //! Binius (lens) uses this for binary constraint encoding.
 
-use cyb_algebra::Field;
+use strata_core::Field;
 
 /// a field with spectral structure: roots of unity and NTT.
 ///
