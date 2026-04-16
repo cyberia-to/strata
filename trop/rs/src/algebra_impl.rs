@@ -43,10 +43,10 @@ impl Encode for Tropical {
     fn byte_len() -> usize {
         8
     }
-    fn to_bytes(&self, buf: &mut [u8]) {
+    fn encode(&self, buf: &mut [u8]) {
         buf[..8].copy_from_slice(&self.0.to_le_bytes());
     }
-    fn from_bytes(bytes: &[u8]) -> Option<Self> {
+    fn decode(bytes: &[u8]) -> Option<Self> {
         if bytes.len() < 8 {
             return None;
         }

@@ -4,7 +4,7 @@
 //! traits needed by lens (polynomial commitment) and zheng (constraint verification).
 //! consumers that only do field arithmetic (hemera) don't need this tier.
 //!
-//! ## Hash2Field
+//! ## Reduce
 //!
 //! derive a field element from hash output bytes. this is the bridge between
 //! hemera (which produces bytes) and field operations (which need elements).
@@ -27,13 +27,13 @@ use cyb_algebra::Field;
 /// should be close to uniform over the field.
 ///
 /// used by lens Transcript::squeeze_field and zheng Fiat-Shamir.
-pub trait Hash2Field: Field {
+pub trait Reduce: Field {
     /// reduce hash output bytes to a field element.
     /// the input length depends on the field:
     /// - Goldilocks: ≥ 8 bytes (take low 8 bytes, reduce mod p)
     /// - F₂¹²⁸: ≥ 16 bytes (take low 16 bytes, interpret as u128)
     /// - F_q: ≥ 64 bytes (take 64 bytes, reduce mod q)
-    fn from_hash(bytes: &[u8]) -> Self;
+    fn reduce(bytes: &[u8]) -> Self;
 }
 
 /// inner product of two field element vectors: Σ aᵢ·bᵢ.

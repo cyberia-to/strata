@@ -35,7 +35,7 @@ traits organized by who needs them — not by abstract algebra taxonomy:
 ┌──────────────────────────────────────────────────────┐
 │              TIER 1: universal (cyb-algebra)          │
 │                                                      │
-│  Encode      to_bytes, from_bytes                    │
+│  Encode      encode, decode                    │
 │  Semiring    add, mul, zero, one          ← trop     │
 │  Ring        + sub, neg                   ← jali     │
 │  Field       + inv, square, pow           ← nebu,    │
@@ -49,8 +49,8 @@ traits organized by who needs them — not by abstract algebra taxonomy:
   (cyb-algebra-    (cyb-algebra-    (cyb-algebra-
    proof)           compute)         ext)
 
-  Hash2Field       Spectral         Extension<Base>
-    from_hash        roots of         base, degree,
+  Reduce       Spectral         Extension<Base>
+    reduce        roots of         base, degree,
     (bytes→F)        unity, NTT       frobenius map
 
   Dot              Bits             Batch
@@ -87,10 +87,10 @@ lens (polynomial commitment) and zheng (constraint verification) need this.
 hemera and nox don't.
 
 ```rust
-use cyb_algebra_proof::{Hash2Field, Dot};
+use cyb_algebra_proof::{Reduce, Dot};
 ```
 
-**Hash2Field** — reduce hash output bytes to a field element. this is the bridge
+**Reduce** — reduce hash output bytes to a field element. this is the bridge
 between hemera (which produces bytes) and field operations (which need elements).
 every Fiat-Shamir challenge in the stack goes through this trait.
 
@@ -138,7 +138,7 @@ no branches on secret data.
 
 ## what each algebra implements
 
-| algebra | Encode | Semiring | Ring | Field | Hash2Field | Dot | Spectral | Bits | Extension | Batch | Blind |
+| algebra | Encode | Semiring | Ring | Field | Reduce | Dot | Spectral | Bits | Extension | Batch | Blind |
 |---------|--------|----------|------|-------|------------|-----|----------|------|-----------|-------|-------------|
 | nebu | yes | yes | yes | yes | yes | yes | yes | yes | — | yes | — |
 | kuro | yes | yes | yes | yes | yes | yes | — | — | — | yes | — |
@@ -236,7 +236,7 @@ assert_eq!((a * a.inv()), Fq::ONE);
 | crate | what |
 |-------|------|
 | [cyb-algebra](core/) | tier 1: Encode, Semiring, Ring, Field |
-| [cyb-algebra-proof](proof/) | tier 2: Hash2Field, Dot |
+| [cyb-algebra-proof](proof/) | tier 2: Reduce, Dot |
 | [cyb-algebra-compute](compute/) | tier 3: Spectral, Bits |
 | [cyb-algebra-ext](ext/) | tier 4: Extension, Batch, Blind |
 | [cyb-nebu](nebu/rs/) | Goldilocks F_p (73 tests) |
@@ -270,9 +270,9 @@ cyb-nebu = "0.1"
 | consumer | tiers needed | why |
 |----------|-------------|-----|
 | [[hemera]] | 1 (Field) | Poseidon2 hash: add, mul, pow7, inv over Goldilocks |
-| [[lens]] | 1 + 2 (Field + Hash2Field) | commit: encode + hash. open: Fiat-Shamir challenges |
+| [[lens]] | 1 + 2 (Field + Reduce) | commit: encode + hash. open: Fiat-Shamir challenges |
 | [[nox]] | 1 + 3 (Field + Spectral + Bits) | VM registers, NTT jets, comparison, bit ops |
-| [[zheng]] | 1 + 2 (Field + Hash2Field + Dot) | constraint evaluation, Fiat-Shamir, matrix products |
+| [[zheng]] | 1 + 2 (Field + Reduce + Dot) | constraint evaluation, Fiat-Shamir, matrix products |
 | [[bbg]] | 1 (Field + Encode) | state polynomial serialization |
 | [[mudra]] | 1 + 4 (Field + Blind) | CSIDH key exchange, threshold protocols |
 
@@ -281,7 +281,7 @@ cyb-nebu = "0.1"
 ```
 algebra/
 ├── core/           cyb-algebra           Semiring → Ring → Field + Encode
-├── proof/          cyb-algebra-proof     Hash2Field + Dot
+├── proof/          cyb-algebra-proof     Reduce + Dot
 ├── compute/        cyb-algebra-compute   Spectral + Bits
 ├── ext/            cyb-algebra-ext       Extension + Batch + Blind
 ├── src/            cyber-algebra         facade

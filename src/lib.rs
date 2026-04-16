@@ -5,7 +5,7 @@
 //! ## tiers
 //!
 //! - tier 1 (`cyb-algebra`): Encode, Semiring, Ring, Field
-//! - tier 2 (`cyb-algebra-proof`): Hash2Field, Dot
+//! - tier 2 (`cyb-algebra-proof`): Reduce, Dot
 //! - tier 3 (`cyb-algebra-compute`): Spectral, Bits
 //! - tier 4 (`cyb-algebra-ext`): Extension, Batch, Blind
 //!
@@ -21,7 +21,7 @@
 pub use cyb_algebra::*;
 
 // tier 2: proof system
-pub use cyb_algebra_proof::{Dot, Hash2Field};
+pub use cyb_algebra_proof::{Dot, Reduce};
 
 // tier 3: computation
 pub use cyb_algebra_compute::{Bits, Spectral};

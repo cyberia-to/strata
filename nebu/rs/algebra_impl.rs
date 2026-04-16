@@ -4,7 +4,7 @@ use crate::field::{Goldilocks, P};
 use cyb_algebra::{Encode, Field, Ring, Semiring};
 use cyb_algebra_compute::{Bits, Spectral};
 use cyb_algebra_ext::Batch;
-use cyb_algebra_proof::{Dot, Hash2Field};
+use cyb_algebra_proof::{Dot, Reduce};
 
 extern crate alloc;
 use alloc::vec::Vec;
@@ -15,10 +15,10 @@ impl Encode for Goldilocks {
     fn byte_len() -> usize {
         8
     }
-    fn to_bytes(&self, buf: &mut [u8]) {
+    fn encode(&self, buf: &mut [u8]) {
         buf[..8].copy_from_slice(&self.as_u64().to_le_bytes());
     }
-    fn from_bytes(bytes: &[u8]) -> Option<Self> {
+    fn decode(bytes: &[u8]) -> Option<Self> {
         if bytes.len() < 8 {
             return None;
         }
@@ -48,8 +48,8 @@ impl Field for Goldilocks {
 
 // ── tier 2: proof ────────────────────────────────────────────────
 
-impl Hash2Field for Goldilocks {
-    fn from_hash(bytes: &[u8]) -> Self {
+impl Reduce for Goldilocks {
+    fn reduce(bytes: &[u8]) -> Self {
         assert!(bytes.len() >= 8, "need at least 8 bytes for Goldilocks");
         let mut buf = [0u8; 8];
         buf.copy_from_slice(&bytes[..8]);

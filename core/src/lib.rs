@@ -8,7 +8,7 @@
 //! every algebra implements at least one of these.
 //!
 //! ```text
-//! Encode     to_bytes, from_bytes — serialization
+//! Encode     encode, decode — serialization
 //! Semiring   add, mul, zero, one — tropical lives here
 //! Ring       + sub, neg — polynomial rings live here
 //! Field      + inv — finite fields live here
@@ -19,7 +19,7 @@
 //! traits needed by lens (commitment) and zheng (verification).
 //!
 //! ```text
-//! Hash2Field   from_hash(bytes) → element — Fiat-Shamir challenges
+//! Reduce   reduce(bytes) → element — Fiat-Shamir challenges
 //! Dot          dot — fused multiply-accumulate for constraint evaluation
 //! ```
 //!
@@ -46,11 +46,11 @@
 //!
 //! | type | crate | tiers |
 //! |------|-------|-------|
-//! | Goldilocks | nebu | Field + Hash2Field + Dot + Spectral + Bits + Extension + Batch |
-//! | F₂¹²⁸ | kuro | Field + Hash2Field + Bits + Extension + Batch |
+//! | Goldilocks | nebu | Field + Reduce + Dot + Spectral + Bits + Extension + Batch |
+//! | F₂¹²⁸ | kuro | Field + Reduce + Bits + Extension + Batch |
 //! | RingElement | jali | (uses Goldilocks for scalar ops) |
 //! | Tropical | trop | Semiring + Encode |
-//! | Fq | genies | Field + Hash2Field + Batch + Blind |
+//! | Fq | genies | Field + Reduce + Batch + Blind |
 
 use core::ops::{Add, AddAssign, Mul, MulAssign, Neg, Sub, SubAssign};
 
@@ -62,9 +62,9 @@ pub trait Encode: Sized {
     /// expected byte length of the serialized form.
     fn byte_len() -> usize;
     /// serialize to a byte buffer. buffer must be at least `byte_len()` bytes.
-    fn to_bytes(&self, buf: &mut [u8]);
+    fn encode(&self, buf: &mut [u8]);
     /// deserialize from bytes. returns None if bytes are invalid.
-    fn from_bytes(bytes: &[u8]) -> Option<Self>;
+    fn decode(bytes: &[u8]) -> Option<Self>;
 }
 
 /// semiring: two operations with identities. no subtraction.

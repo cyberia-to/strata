@@ -3,7 +3,7 @@
 use crate::fq::Fq;
 use cyb_algebra::{Encode, Field, Ring, Semiring};
 use cyb_algebra_ext::{Batch, Blind};
-use cyb_algebra_proof::{Dot, Hash2Field};
+use cyb_algebra_proof::{Dot, Reduce};
 
 extern crate alloc;
 use alloc::vec::Vec;
@@ -14,12 +14,12 @@ impl Encode for Fq {
     fn byte_len() -> usize {
         64
     }
-    fn to_bytes(&self, buf: &mut [u8]) {
+    fn encode(&self, buf: &mut [u8]) {
         for (i, &limb) in self.limbs.iter().enumerate() {
             buf[i * 8..(i + 1) * 8].copy_from_slice(&limb.to_le_bytes());
         }
     }
-    fn from_bytes(bytes: &[u8]) -> Option<Self> {
+    fn decode(bytes: &[u8]) -> Option<Self> {
         if bytes.len() < 64 {
             return None;
         }
@@ -53,8 +53,8 @@ impl Field for Fq {
 
 // ── tier 2 ───────────────────────────────────────────────────────
 
-impl Hash2Field for Fq {
-    fn from_hash(bytes: &[u8]) -> Self {
+impl Reduce for Fq {
+    fn reduce(bytes: &[u8]) -> Self {
         assert!(bytes.len() >= 64, "need at least 64 bytes for Fq");
         let mut limbs = [0u64; 8];
         for (i, chunk) in bytes[..64].chunks_exact(8).enumerate() {

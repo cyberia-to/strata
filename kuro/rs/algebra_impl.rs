@@ -4,7 +4,7 @@
 use crate::tower::F2_128;
 use cyb_algebra::{Encode, Field, Ring, Semiring};
 use cyb_algebra_ext::Batch;
-use cyb_algebra_proof::{Dot, Hash2Field};
+use cyb_algebra_proof::{Dot, Reduce};
 
 extern crate alloc;
 use alloc::vec::Vec;
@@ -15,10 +15,10 @@ impl Encode for F2_128 {
     fn byte_len() -> usize {
         16
     }
-    fn to_bytes(&self, buf: &mut [u8]) {
+    fn encode(&self, buf: &mut [u8]) {
         buf[..16].copy_from_slice(&self.0.to_le_bytes());
     }
-    fn from_bytes(bytes: &[u8]) -> Option<Self> {
+    fn decode(bytes: &[u8]) -> Option<Self> {
         if bytes.len() < 16 {
             return None;
         }
@@ -48,8 +48,8 @@ impl Field for F2_128 {
 
 // ── tier 2 ───────────────────────────────────────────────────────
 
-impl Hash2Field for F2_128 {
-    fn from_hash(bytes: &[u8]) -> Self {
+impl Reduce for F2_128 {
+    fn reduce(bytes: &[u8]) -> Self {
         assert!(bytes.len() >= 16, "need at least 16 bytes for F2_128");
         let mut buf = [0u8; 16];
         buf.copy_from_slice(&bytes[..16]);
