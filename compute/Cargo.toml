@@ -1,0 +1,13 @@
+[package]
+name = "cyb-algebra-compute"
+version.workspace = true
+edition.workspace = true
+license-file = "../LICENSE"
+description = "computation traits: Spectral, Bits — for nox and jali"
+repository.workspace = true
+rust-version.workspace = true
+keywords = ["algebra", "ntt", "fft", "spectral", "crypto"]
+categories = ["cryptography"]
+
+[dependencies]
+cyb-algebra.workspace = true

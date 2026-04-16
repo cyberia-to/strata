@@ -17,6 +17,8 @@ path = "lib.rs"
 
 [dependencies]
 cyb-algebra.workspace = true
+cyb-algebra-proof.workspace = true
+cyb-algebra-ext.workspace = true
 
 [dev-dependencies]
 criterion.workspace = true

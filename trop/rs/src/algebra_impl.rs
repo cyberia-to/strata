@@ -1,9 +1,11 @@
-//! Semiring implementation for Tropical.
-//! Tropical addition = min, tropical multiplication = saturating add.
+//! trait implementations for Tropical — tier 1 only (Semiring + Encode).
+//! Tropical has no subtraction or inversion — Semiring is the highest level.
 
 use crate::element::Tropical;
 use core::ops::{Add, AddAssign, Mul, MulAssign};
-use cyb_algebra::Semiring;
+use cyb_algebra::{Encode, Semiring};
+
+// ── std::ops (required by Semiring) ──────────────────────────────
 
 impl Add for Tropical {
     type Output = Self;
@@ -32,6 +34,25 @@ impl MulAssign for Tropical {
     #[inline]
     fn mul_assign(&mut self, rhs: Self) {
         *self = Tropical::mul(*self, rhs);
+    }
+}
+
+// ── tier 1 ───────────────────────────────────────────────────────
+
+impl Encode for Tropical {
+    fn byte_len() -> usize {
+        8
+    }
+    fn to_bytes(&self, buf: &mut [u8]) {
+        buf[..8].copy_from_slice(&self.0.to_le_bytes());
+    }
+    fn from_bytes(bytes: &[u8]) -> Option<Self> {
+        if bytes.len() < 8 {
+            return None;
+        }
+        let mut buf = [0u8; 8];
+        buf.copy_from_slice(&bytes[..8]);
+        Some(Tropical(u64::from_le_bytes(buf)))
     }
 }
 

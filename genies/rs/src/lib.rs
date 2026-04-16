@@ -11,8 +11,8 @@
 
 #![no_std]
 
-mod algebra_impl;
 pub mod action;
+mod algebra_impl;
 pub mod curve;
 pub mod encoding;
 pub mod fq;

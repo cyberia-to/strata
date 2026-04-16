@@ -1,0 +1,13 @@
+[package]
+name = "cyb-algebra-ext"
+version.workspace = true
+edition.workspace = true
+license-file = "../LICENSE"
+description = "structural traits: Extension, Batch, ConstantTime — for tower fields and privacy"
+repository.workspace = true
+rust-version.workspace = true
+keywords = ["algebra", "extension-field", "batch", "constant-time"]
+categories = ["cryptography"]
+
+[dependencies]
+cyb-algebra.workspace = true

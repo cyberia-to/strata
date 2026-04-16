@@ -22,6 +22,9 @@ path = "lib.rs"
 
 [dependencies]
 cyb-algebra.workspace = true
+cyb-algebra-proof.workspace = true
+cyb-algebra-compute.workspace = true
+cyb-algebra-ext.workspace = true
 acpu = { version = "0.2", optional = true }
 
 [features]

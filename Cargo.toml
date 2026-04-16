@@ -1,7 +1,7 @@
 [workspace]
 resolver = "3"
 members = [
-    "core",
+    "core", "proof", "compute", "ext",
     "src",
     "nebu/rs", "nebu/wgsl", "nebu/cli",
     "kuro/rs", "kuro/wgsl", "kuro/cli",
@@ -18,8 +18,13 @@ repository = "https://github.com/cyberia-to/algebra"
 rust-version = "1.89"
 
 [workspace.dependencies]
-# internal
+# tier crates
 cyb-algebra = { path = "core" }
+cyb-algebra-proof = { path = "proof" }
+cyb-algebra-compute = { path = "compute" }
+cyb-algebra-ext = { path = "ext" }
+
+# algebra crates
 nebu = { version = "0.1.0", path = "nebu/rs", package = "cyb-nebu" }
 kuro = { version = "0.1.0", path = "kuro/rs", package = "cyb-kuro" }
 jali = { version = "0.1.0", path = "jali/rs", package = "cyb-jali" }
