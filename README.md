@@ -16,197 +16,286 @@ algebra → hemera (hash) → lens (commitment) → nox (execution) → zheng (p
 
 ## why five
 
-one algebra cannot span all computation. arithmetic circuits want fast prime fields.
-bitwise operations want characteristic 2. FHE needs polynomial rings. optimization
-needs tropical semirings. privacy needs isogeny curves. each structure matches the
-shape of the computation it verifies:
+one algebra cannot span all computation. each structure matches the shape of the
+computation it verifies:
 
-| algebra | structure | operations | what it proves |
-|---------|-----------|-----------|---------------|
-| [[nebu]] | Goldilocks field F_p | add, mul, inv in 4-5 cycles | arithmetic: tri-kernel, state transitions |
-| [[kuro]] | binary tower F₂¹²⁸ | XOR, AND at 1 constraint each | bitwise: quantized AI inference, comparison |
-| [[jali]] | polynomial ring R_q | NTT multiply, automorphisms | lattice: FHE bootstrapping, KEM |
-| [[trop]] | tropical semiring (min,+) | shortest path, assignment | optimization: routing, transport, Viterbi |
-| [[genies]] | isogeny field F_q | 512-bit curve walks | privacy: stealth addresses, VDF, blind signatures |
+| algebra | structure | why it exists |
+|---------|-----------|--------------|
+| [[nebu]] | Goldilocks field F_p | arithmetic: 4-5 cycle multiply, 2^32 roots of unity for NTT |
+| [[kuro]] | binary tower F₂¹²⁸ | bitwise: XOR/AND at 1 constraint, 128 elements per machine word |
+| [[jali]] | polynomial ring R_q | lattice: FHE bootstrapping, NTT-based ring multiply |
+| [[trop]] | tropical semiring (min,+) | optimization: shortest path, assignment, Viterbi, transport |
+| [[genies]] | isogeny field F_q | privacy: stealth addresses, VDF, blind signatures (512-bit, constant-time) |
 
-a circuit that mixes bitwise and arithmetic operations splits across kuro and nebu.
-a circuit that proves FHE correctness splits across jali, kuro, and nebu. the proof
-system ([[zheng]]) folds them together — the algebra layer provides the scalars.
+## four tiers
 
-## the trait hierarchy
+traits organized by who needs them — not by abstract algebra taxonomy:
 
-three levels. each includes the previous:
+```
+┌──────────────────────────────────────────────────────┐
+│              TIER 1: universal (cyb-algebra)          │
+│                                                      │
+│  Encode      to_bytes, from_bytes                    │
+│  Semiring    add, mul, zero, one          ← trop     │
+│  Ring        + sub, neg                   ← jali     │
+│  Field       + inv, square, pow           ← nebu,    │
+│                                             kuro,    │
+│                                             genies   │
+└───────────────────────┬──────────────────────────────┘
+                        │
+       ┌────────────────┼────────────────┐
+       │                │                │
+  TIER 2: proofs   TIER 3: compute  TIER 4: structure
+  (cyb-algebra-    (cyb-algebra-    (cyb-algebra-
+   proof)           compute)         ext)
 
-```rust
-/// semiring: add and multiply with identities. no subtraction.
-/// trop lives here — min has no inverse.
-trait Semiring: Copy + Eq + Add + Mul {
-    const ZERO: Self;  // additive identity
-    const ONE: Self;   // multiplicative identity
-}
+  Hash2Field       Spectral         Extension<Base>
+    from_hash        roots of         base, degree,
+    (bytes→F)        unity, NTT       frobenius map
 
-/// ring: semiring with subtraction and negation.
-/// jali's RingElement would live here (if it were Copy).
-trait Ring: Semiring + Sub + Neg {}
+  Fma              Bits             Batch
+    sum_of_          to_bits,         batch_inv
+    products         from_bits        (Montgomery)
 
-/// field: ring with multiplicative inverse.
-/// nebu, kuro, genies satisfy this.
-trait Field: Ring {
-    fn inv(self) -> Self;
-    fn from_hash(bytes: &[u8]) -> Self;
-}
+                                    ConstantTime
+                                      ct_eq, ct_select,
+                                      ct_swap
 ```
 
-the hierarchy is the API contract between algebra and the rest of the stack.
-[[hemera]] hashes field elements. [[lens]] commits multilinear polynomials over fields.
-[[zheng]] verifies constraints over fields. they all program against these traits,
-not against concrete types.
+### tier 1: universal
+
+every algebra implements at least one level. hemera needs this tier only.
+
+```rust
+use cyb_algebra::{Semiring, Ring, Field, Encode};
+```
+
+**Semiring** — add and multiply with identities. the tropical semiring (min, +) lives
+here: min has no inverse, so no subtraction. trop implements Semiring and stops.
+
+**Ring** — semiring with subtraction. polynomial ring R_q (jali) conceptually lives here.
+
+**Field** — ring with multiplicative inverse. Goldilocks (nebu), F₂¹²⁸ (kuro), and F_q
+(genies) all implement this.
+
+**Encode** — serialize to/from bytes. every type implements this. no more ad-hoc
+`to_le_bytes` scattered across crates.
+
+### tier 2: proofs
+
+lens (polynomial commitment) and zheng (constraint verification) need this.
+hemera and nox don't.
+
+```rust
+use cyb_algebra_proof::{Hash2Field, Fma};
+```
+
+**Hash2Field** — reduce hash output bytes to a field element. this is the bridge
+between hemera (which produces bytes) and field operations (which need elements).
+every Fiat-Shamir challenge in the stack goes through this trait.
+
+**Fma** — fused multiply-accumulate: Σ aᵢ·bᵢ. zheng evaluates CCS constraints
+as matrix-vector products over field elements. the default implementation is a
+loop; algebras can override with hardware FMA or delayed modular reduction.
+
+### tier 3: compute
+
+nox (VM execution) and jali (ring arithmetic) need this.
+
+```rust
+use cyb_algebra_compute::{Spectral, Bits};
+```
+
+**Spectral** — a field with roots of unity. the spectral domain (NTT evaluation domain)
+exists, enabling O(N log N) polynomial operations instead of O(N²). Goldilocks has
+two-adicity 32 — the multiplicative group F_p* has a subgroup of order 2^32 generated
+by the 2^32-th root of unity. F₂¹²⁸ and F_q lack this structure.
+
+the name comes from spectral methods in numerical analysis: transform between coefficient
+and evaluation domains, compute in whichever is cheaper, transform back.
+
+**Bits** — decompose field elements into bits and reconstruct. nox uses this for
+comparison (lt), shifts, and masks. Binius (lens) uses it for binary constraint encoding.
+
+### tier 4: structure
+
+specific algebraic structures that not every algebra needs.
+
+```rust
+use cyb_algebra_ext::{Extension, Batch, ConstantTime};
+```
+
+**Extension\<Base\>** — tower fields. Fp2, Fp3, Fp4 over Goldilocks (nebu extensions).
+F₂ → F₂² → F₂⁴ → ... → F₂¹²⁸ (kuro tower). an extension field has a base field,
+a degree, and a Frobenius endomorphism.
+
+**Batch** — Montgomery's trick: invert N elements with 1 inversion + 3(N-1)
+multiplications. nebu, kuro, and genies all implement this.
+
+**ConstantTime** — timing-safe operations. genies (CSIDH) requires this: isogeny walks
+on secret exponents must not leak timing information. ct_eq, ct_select, ct_swap —
+no branches on secret data.
+
+## what each algebra implements
+
+| algebra | Encode | Semiring | Ring | Field | Hash2Field | Fma | Spectral | Bits | Extension | Batch | ConstantTime |
+|---------|--------|----------|------|-------|------------|-----|----------|------|-----------|-------|-------------|
+| nebu | yes | yes | yes | yes | yes | yes | yes | yes | — | yes | — |
+| kuro | yes | yes | yes | yes | yes | yes | — | — | — | yes | — |
+| jali | — | — | — | — | — | — | — | — | — | — | — |
+| trop | yes | yes | — | — | — | — | — | — | — | — | — |
+| genies | yes | yes | yes | yes | yes | yes | — | — | — | yes | yes |
+
+jali's RingElement (32 KiB fixed array) is too large for Copy, so it doesn't implement
+the scalar traits. Ikat (lens) operates on its NTT slots — which are Goldilocks scalars.
 
 ## the five algebras
 
-### nebu — Goldilocks field (F_p)
+### nebu — Goldilocks field
 
-the workhorse. p = 2^64 - 2^32 + 1 — chosen because reduction is two shifts
-and an add, giving 4-5 cycle multiply on modern CPUs. the 2^32 roots of unity
-enable NTT (number theoretic transform) for fast polynomial multiplication.
+p = 2^64 - 2^32 + 1. reduction is two shifts and an add. 4-5 cycle multiply.
+2^32 roots of unity for NTT. the workhorse of the stack.
 
 ```rust
 use nebu::Goldilocks;
+use cyb_algebra::Field;
 
 let a = Goldilocks::new(42);
 let b = a.inv();
 assert_eq!(a * b, Goldilocks::ONE);
 ```
 
-73 tests. extensions: Fp2, Fp3, Fp4 for higher-degree arithmetic.
+73 tests. extensions: Fp2, Fp3, Fp4.
 
-### kuro — binary tower (F₂¹²⁸)
+### kuro — binary tower
 
-128 field elements packed in one machine word. addition is XOR (one instruction).
-multiplication is Karatsuba over the tower: F₂ → F₂² → F₂⁴ → ... → F₂¹²⁸,
-where each level is defined by x² + x + α.
+F₂ → F₂² → F₂⁴ → F₂⁸ → F₂¹⁶ → F₂³² → F₂⁶⁴ → F₂¹²⁸. each level defined by
+x² + x + α (Wiedemann tower). addition = XOR. multiplication = Karatsuba over
+tower levels. 128 elements packed in one u128.
 
 ```rust
 use kuro::F2_128;
 
 let a = F2_128(0xDEAD_BEEF);
-let b = F2_128(0xCAFE_BABE);
-assert_eq!(a + a, F2_128::ZERO);  // char 2: a + a = 0
-assert_eq!(-a, a);                 // char 2: negation is identity
+assert_eq!(a + a, F2_128::ZERO);  // char 2
+assert_eq!(-a, a);                 // negation is identity
 ```
 
-77 tests. Packed128: 128 F₂ elements in one u128 for SIMD-style batch operations.
+77 tests. Packed128: 128 F₂ elements for SIMD-style operations.
 
-### jali — polynomial ring (R_q)
+### jali — polynomial ring
 
-R_q = F_p[x]/(x^n+1) with n up to 4096. the cyclotomic ring where FHE lives.
-multiply via negacyclic NTT: twist by ψ^i, forward NTT, pointwise multiply,
-inverse NTT, untwist. noise tracking monitors decryption budget through operations.
+R_q = F_p[x]/(x^n+1) with n up to 4096. negacyclic NTT for O(n log n) ring multiply.
+noise tracking for FHE correctness. Galois automorphisms for key switching.
 
 ```rust
 use jali::ring::RingElement;
-use nebu::Goldilocks;
-
-let mut a = RingElement::new(1024);
-a.coeffs[0] = Goldilocks::new(42);
-let b = a.mul(&a);  // polynomial multiplication via NTT
+let a = RingElement::new(1024);
+let b = a.mul(&a);  // NTT-based polynomial multiplication
 ```
 
-70 tests. automorphisms: Galois σ_k for key switching in FHE.
+70 tests.
 
-### trop — tropical semiring (min, +)
+### trop — tropical semiring
 
-tropical addition is min. tropical multiplication is ordinary addition (saturating).
-additive identity is +inf. multiplicative identity is 0. no subtraction exists —
-you cannot un-min.
-
-this algebra proves optimization: shortest paths (Dijkstra), assignment (Hungarian),
-sequence alignment (Viterbi), transport (Kantorovich). the prover runs the algorithm,
-the verifier checks the witness via LP dual certificates.
+addition = min. multiplication = saturating add. identity: zero = +inf, one = 0.
+no subtraction — you cannot un-min. proves optimization: Dijkstra, Hungarian,
+Viterbi, Kantorovich.
 
 ```rust
 use trop::Tropical;
+use cyb_algebra::Semiring;
 
 let a = Tropical::from_u64(3);
 let b = Tropical::from_u64(7);
-assert_eq!(a.add(b), Tropical::from_u64(3));   // min(3, 7) = 3
-assert_eq!(a.mul(b), Tropical::from_u64(10));   // 3 + 7 = 10
+assert_eq!(a + b, Tropical::from_u64(3));   // min(3, 7) = 3
+assert_eq!(a * b, Tropical::from_u64(10));   // 3 + 7 = 10
 ```
 
-77 tests. Kleene star (all-pairs shortest paths), tropical determinant,
-minimum mean cycle eigenvalue.
+77 tests. Kleene star, determinant, eigenvalue.
 
-### genies — isogeny curves (F_q)
+### genies — isogeny curves
 
-512-bit prime field for CSIDH: q = 4 · 3 · 5 · 7 · ... · 587 - 1.
-the one module with a foreign prime — Goldilocks p+1 has no small odd factors,
-making CSIDH impossible over F_p. eight u64 limbs, schoolbook multiplication,
-Barrett reduction. all arithmetic is constant-time (no secret-dependent branching).
+512-bit prime q = 4·3·5·7·...·587 - 1 (CSIDH-512). the one module with a foreign
+prime — Goldilocks p+1 has no small odd factors, making CSIDH impossible over F_p.
+eight u64 limbs, schoolbook multiplication, Barrett reduction. all arithmetic is
+constant-time.
 
 ```rust
 use genies::Fq;
+use cyb_algebra::Field;
 
 let a = Fq::from_u64(42);
-let b = Fq::inv(&a);
-assert_eq!(Fq::mul(&a, &b), Fq::ONE);
+assert_eq!((a * a.inv()), Fq::ONE);
 ```
 
-55 tests. Montgomery curves, isogeny walks, class group action for
-Diffie-Hellman, VRF, VDF, blind signatures.
+55 tests. Montgomery curves, isogeny walks, class group action.
 
 ## crates
 
-| crate | crates.io | what |
-|-------|-----------|------|
-| cyb-algebra | [cyb-algebra](https://crates.io/crates/cyb-algebra) | Semiring, Ring, Field traits |
-| cyb-nebu | [cyb-nebu](https://crates.io/crates/cyb-nebu) | Goldilocks F_p |
-| cyb-kuro | [cyb-kuro](https://crates.io/crates/cyb-kuro) | F₂ binary tower |
-| cyb-jali | [cyb-jali](https://crates.io/crates/cyb-jali) | polynomial ring R_q |
-| cyb-trop | [cyb-trop](https://crates.io/crates/cyb-trop) | tropical semiring |
-| cyb-genies | [cyb-genies](https://crates.io/crates/cyb-genies) | isogeny curves F_q |
-| cyber-algebra | [cyber-algebra](https://crates.io/crates/cyber-algebra) | facade: re-exports all |
+| crate | what |
+|-------|------|
+| [cyb-algebra](core/) | tier 1: Encode, Semiring, Ring, Field |
+| [cyb-algebra-proof](proof/) | tier 2: Hash2Field, Fma |
+| [cyb-algebra-compute](compute/) | tier 3: Spectral, Bits |
+| [cyb-algebra-ext](ext/) | tier 4: Extension, Batch, ConstantTime |
+| [cyb-nebu](nebu/rs/) | Goldilocks F_p (73 tests) |
+| [cyb-kuro](kuro/rs/) | F₂ binary tower (77 tests) |
+| [cyb-jali](jali/rs/) | polynomial ring R_q (70 tests) |
+| [cyb-trop](trop/rs/) | tropical semiring (77 tests) |
+| [cyb-genies](genies/rs/) | isogeny curves F_q (55 tests) |
+| [cyber-algebra](src/) | facade: re-exports everything |
 
 ```toml
 # everything
 [dependencies]
 cyber-algebra = "0.1"
 
-# just one algebra
-[dependencies]
-cyb-nebu = "0.1"
-
 # just the traits (for libraries generic over Field)
 [dependencies]
 cyb-algebra = "0.1"
-```
 
-## workspace structure
+# traits + proof tier (for lens, zheng)
+[dependencies]
+cyb-algebra = "0.1"
+cyb-algebra-proof = "0.1"
 
-```
-algebra/
-├── core/           cyb-algebra        Semiring → Ring → Field
-├── src/            cyber-algebra      facade re-exports
-├── nebu/                              Goldilocks F_p
-│   ├── rs/         cyb-nebu           core library (73 tests)
-│   ├── wgsl/       nebu-wgsl          GPU compute shaders
-│   ├── cli/        nebu-cli           command-line tool
-│   ├── tri/                           Trident ZK circuits
-│   └── specs/                         canonical specifications
-├── kuro/           (same structure)   binary tower F₂
-├── jali/                              polynomial ring R_q
-├── trop/                              tropical semiring
-└── genies/                            isogeny curves F_q
+# one specific algebra
+[dependencies]
+cyb-nebu = "0.1"
 ```
 
 ## who uses this
 
-| consumer | what it needs | why |
-|----------|--------------|-----|
-| [[hemera]] | Goldilocks (nebu) | Poseidon2 hash operates over F_p |
-| [[lens]] | all five fields | polynomial commitment per algebra |
-| [[nox]] | Goldilocks, F₂ (nebu, kuro) | VM registers are field elements |
-| [[zheng]] | all five fields | constraint verification per algebra |
-| [[mudra]] | R_q, F_q (jali, genies) | KEM, CSIDH, FHE protocols |
+| consumer | tiers needed | why |
+|----------|-------------|-----|
+| [[hemera]] | 1 (Field) | Poseidon2 hash: add, mul, pow7, inv over Goldilocks |
+| [[lens]] | 1 + 2 (Field + Hash2Field) | commit: encode + hash. open: Fiat-Shamir challenges |
+| [[nox]] | 1 + 3 (Field + Spectral + Bits) | VM registers, NTT jets, comparison, bit ops |
+| [[zheng]] | 1 + 2 (Field + Hash2Field + Fma) | constraint evaluation, Fiat-Shamir, matrix products |
+| [[bbg]] | 1 (Field + Encode) | state polynomial serialization |
+| [[mudra]] | 1 + 4 (Field + ConstantTime) | CSIDH key exchange, threshold protocols |
+
+## workspace
+
+```
+algebra/
+├── core/           cyb-algebra           Semiring → Ring → Field + Encode
+├── proof/          cyb-algebra-proof     Hash2Field + Fma
+├── compute/        cyb-algebra-compute   Spectral + Bits
+├── ext/            cyb-algebra-ext       Extension + Batch + ConstantTime
+├── src/            cyber-algebra         facade
+├── nebu/           Goldilocks F_p
+│   ├── rs/         core (73 tests)
+│   ├── wgsl/       GPU compute shaders
+│   ├── cli/        command-line tool
+│   ├── tri/        Trident ZK circuits
+│   └── specs/      canonical specs
+├── kuro/           F₂ binary tower (77 tests)
+├── jali/           polynomial ring R_q (70 tests)
+├── trop/           tropical semiring (77 tests)
+└── genies/         isogeny curves F_q (55 tests)
+```
 
 ## 352 tests
 
