@@ -59,11 +59,22 @@ fn bench_ntt_1024(c: &mut Criterion) {
 }
 
 fn bench_ntt_4096(c: &mut Criterion) {
-    let mut data: Vec<Goldilocks> = (0..4096).map(|i| Goldilocks::new(i)).collect();
+    let data: Vec<Goldilocks> = (0..4096).map(|i| Goldilocks::new(i)).collect();
     c.bench_function("NTT forward 4096", |bench| {
         bench.iter(|| {
             let mut d = data.clone();
             ntt::ntt(black_box(&mut d));
+        })
+    });
+}
+
+fn bench_ntt_4096_twiddles(c: &mut Criterion) {
+    let data: Vec<Goldilocks> = (0..4096).map(|i| Goldilocks::new(i)).collect();
+    let twiddles = ntt::precompute_twiddles_vec(4096);
+    c.bench_function("NTT forward 4096 (precomputed)", |bench| {
+        bench.iter(|| {
+            let mut d = data.clone();
+            ntt::ntt_with_twiddles(black_box(&mut d), &twiddles);
         })
     });
 }
@@ -98,5 +109,6 @@ criterion_group!(
     bench_ntt_4096,
     bench_batch_inv_1000,
     bench_dot_1000,
+    bench_ntt_4096_twiddles,
 );
 criterion_main!(benches);
