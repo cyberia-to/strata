@@ -60,3 +60,7 @@ impl Semiring for Tropical {
     const ZERO: Self = Tropical::ZERO; // +inf (additive identity for min)
     const ONE: Self = Tropical::ONE; // 0 (multiplicative identity for +)
 }
+
+// ── property tests ───────────────────────────────────────────────
+
+strata_core::test_semiring_axioms!(Tropical, tropical_axioms, |v: u64| Tropical::from_u64(v));

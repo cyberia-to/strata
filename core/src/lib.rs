@@ -52,6 +52,8 @@
 //! | Tropical | trop | Semiring + Codec |
 //! | Fq | genies | Field + Reduce + Dot + Batch + Blind |
 
+pub mod testing;
+
 use core::ops::{Add, AddAssign, Mul, MulAssign, Neg, Sub, SubAssign};
 
 // ── tier 1: universal ────────────────────────────────────────────

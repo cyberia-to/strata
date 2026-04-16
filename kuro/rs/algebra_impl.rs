@@ -71,3 +71,77 @@ impl Batch for F2_128 {
         crate::batch::batch_inv_128(&input, elements);
     }
 }
+
+// ── property tests ───────────────────────────────────────────────
+
+#[cfg(test)]
+mod f2_128_axioms {
+    use super::*;
+    use strata_core::{Field, Semiring};
+
+    fn elems() -> Vec<F2_128> {
+        (1..20u128).map(|i| F2_128(i * 0x1111)).collect()
+    }
+
+    #[test]
+    fn mul_inverse() {
+        for a in elems() {
+            assert_eq!(a * a.inv(), F2_128::ONE);
+        }
+    }
+    #[test]
+    fn try_inv_zero() {
+        assert!(F2_128::ZERO.try_inv().is_none());
+    }
+    #[test]
+    fn square_is_mul() {
+        for a in elems() {
+            assert_eq!(a.square(), a * a);
+        }
+    }
+    #[test]
+    fn double_is_add() {
+        for a in elems() {
+            assert_eq!(a.double(), a + a);
+        }
+    }
+    #[test]
+    fn pow_zero() {
+        for a in elems() {
+            assert_eq!(a.pow(0), F2_128::ONE);
+        }
+    }
+    #[test]
+    fn pow_one() {
+        for a in elems() {
+            assert_eq!(a.pow(1), a);
+        }
+    }
+    #[test]
+    fn sqrt_of_square() {
+        for a in elems() {
+            let s = a.square();
+            assert_eq!(<F2_128 as Field>::sqrt(s).unwrap().square(), s);
+        }
+    }
+    #[test]
+    fn add_comm() {
+        let e = elems();
+        for w in e.windows(2) {
+            assert_eq!(w[0] + w[1], w[1] + w[0]);
+        }
+    }
+    #[test]
+    fn mul_comm() {
+        let e = elems();
+        for w in e.windows(2) {
+            assert_eq!(w[0] * w[1], w[1] * w[0]);
+        }
+    }
+    #[test]
+    fn neg_is_self() {
+        for a in elems() {
+            assert_eq!(-a, a);
+        }
+    } // char 2
+}

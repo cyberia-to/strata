@@ -146,3 +146,8 @@ impl Batch for Goldilocks {
         }
     }
 }
+
+// ── property tests ───────────────────────────────────────────────
+
+strata_core::test_field_axioms!(Goldilocks, goldilocks_axioms, |v: u64| Goldilocks::new(v)
+    .canonicalize());

@@ -156,3 +156,7 @@ impl Blind for Fq {
         }
     }
 }
+
+// ── property tests ───────────────────────────────────────────────
+
+strata_core::test_field_axioms!(Fq, fq_axioms, |v: u64| Fq::from_u64(v));
