@@ -30,3 +30,10 @@ acpu = { version = "0.2", optional = true }
 [features]
 default = ["fast"]
 fast = ["acpu"]
+
+[dev-dependencies]
+criterion.workspace = true
+
+[[bench]]
+name = "goldilocks"
+harness = false
