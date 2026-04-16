@@ -49,6 +49,16 @@ impl Field for Fq {
     fn square(self) -> Self {
         Fq::square(&self)
     }
+    fn sqrt(self) -> Option<Self> {
+        Fq::sqrt(&self)
+    }
+    fn pow_bytes(self, exp: &[u64]) -> Self {
+        // pad or truncate to 8 limbs for Fq::pow_limbs
+        let mut limbs = [0u64; 8];
+        let n = exp.len().min(8);
+        limbs[..n].copy_from_slice(&exp[..n]);
+        Fq::pow_limbs(&self, &limbs)
+    }
 }
 
 // ── tier 2 ───────────────────────────────────────────────────────

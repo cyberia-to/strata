@@ -1,8 +1,8 @@
 //! trait implementations for Goldilocks — all four tiers.
 
 use crate::field::{Goldilocks, P};
-use strata_core::{Codec, Field, Ring, Semiring};
 use strata_compute::{Bits, Spectral};
+use strata_core::{Codec, Field, Ring, Semiring};
 use strata_ext::Batch;
 use strata_proof::{Dot, Reduce};
 
@@ -43,6 +43,9 @@ impl Field for Goldilocks {
     #[inline]
     fn square(self) -> Self {
         Goldilocks::square(self)
+    }
+    fn sqrt(self) -> Option<Self> {
+        crate::sqrt::sqrt(self)
     }
 }
 

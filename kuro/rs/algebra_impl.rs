@@ -44,6 +44,10 @@ impl Field for F2_128 {
     fn square(self) -> Self {
         F2_128::square(self)
     }
+    fn sqrt(self) -> Option<Self> {
+        // in char 2, every element has a unique square root
+        Some(F2_128::sqrt(self))
+    }
 }
 
 // ── tier 2 ───────────────────────────────────────────────────────

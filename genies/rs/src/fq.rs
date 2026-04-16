@@ -330,7 +330,7 @@ impl Fq {
     }
 
     /// Modular exponentiation by a 512-bit exponent given as 8 limbs.
-    fn pow_limbs(base: &Fq, exp: &[u64; 8]) -> Fq {
+    pub fn pow_limbs(base: &Fq, exp: &[u64; 8]) -> Fq {
         let mut result = Fq::ONE;
         let mut i: usize = 8;
         while i > 0 {
