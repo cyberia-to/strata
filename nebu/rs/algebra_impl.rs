@@ -24,7 +24,12 @@ impl Codec for Goldilocks {
         }
         let mut buf = [0u8; 8];
         buf.copy_from_slice(&bytes[..8]);
-        Some(Goldilocks::new(u64::from_le_bytes(buf)).canonicalize())
+        let val = u64::from_le_bytes(buf);
+        // reject non-canonical: value must be < p
+        if val >= P {
+            return None;
+        }
+        Some(Goldilocks::new(val))
     }
 }
 

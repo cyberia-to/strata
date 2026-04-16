@@ -29,7 +29,21 @@ impl Codec for Fq {
             buf.copy_from_slice(chunk);
             limbs[i] = u64::from_le_bytes(buf);
         }
-        Some(Fq::reduce(&Fq::from_limbs(limbs).limbs))
+        // reject non-canonical: value must be < PRIME
+        // compare limbs from most significant to least
+        for i in (0..8).rev() {
+            if limbs[i] > crate::fq::PRIME[i] {
+                return None;
+            }
+            if limbs[i] < crate::fq::PRIME[i] {
+                break; // definitely less
+            }
+        }
+        // if we get here without breaking, all limbs equal → value == PRIME → reject
+        if limbs == crate::fq::PRIME {
+            return None;
+        }
+        Some(Fq::from_limbs(limbs))
     }
 }
 
