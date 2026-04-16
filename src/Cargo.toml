@@ -1,0 +1,23 @@
+[package]
+name = "cyber-algebra"
+version.workspace = true
+edition.workspace = true
+license-file = "../LICENSE"
+description = "five algebraic backends for verifiable computation"
+repository.workspace = true
+rust-version.workspace = true
+keywords = ["algebra", "field", "ring", "semiring", "crypto"]
+categories = ["cryptography", "mathematics"]
+readme = "../README.md"
+
+[lib]
+name = "algebra"
+path = "lib.rs"
+
+[dependencies]
+cyb-algebra.workspace = true
+nebu.workspace = true
+kuro.workspace = true
+jali.workspace = true
+trop.workspace = true
+genies.workspace = true

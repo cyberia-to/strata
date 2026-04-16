@@ -1,0 +1,10 @@
+[package]
+name = "trop-cli"
+version.workspace = true
+edition.workspace = true
+description = "CLI for tropical semiring operations"
+publish = false
+
+[dependencies]
+trop.workspace = true
+trop-wgsl.workspace = true

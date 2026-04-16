@@ -1,0 +1,10 @@
+[package]
+name = "cyb-algebra"
+version.workspace = true
+edition.workspace = true
+license-file = "../LICENSE"
+description = "algebraic trait hierarchy: Semiring, Ring, Field"
+repository.workspace = true
+rust-version.workspace = true
+keywords = ["algebra", "field", "ring", "semiring", "crypto"]
+categories = ["cryptography", "mathematics", "no-std::no-alloc"]
