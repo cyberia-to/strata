@@ -35,7 +35,7 @@ traits organized by who needs them — not by abstract algebra taxonomy:
 ┌──────────────────────────────────────────────────────┐
 │              TIER 1: universal (strata-core)          │
 │                                                      │
-│  Encode      encode, decode                    │
+│  Codec      encode, decode                    │
 │  Semiring    add, mul, zero, one          ← trop     │
 │  Ring        + sub, neg                   ← jali     │
 │  Field       + inv, square, pow           ← nebu,    │
@@ -78,7 +78,7 @@ here: min has no inverse, so no subtraction. trop implements Semiring and stops.
 **Field** — ring with multiplicative inverse. Goldilocks (nebu), F₂¹²⁸ (kuro), and F_q
 (genies) all implement this.
 
-**Encode** — serialize to/from bytes. every type implements this. no more ad-hoc
+**Codec** — serialize to/from bytes. every type implements this. no more ad-hoc
 `to_le_bytes` scattered across crates.
 
 ### tier 2: proofs
@@ -273,14 +273,14 @@ cyb-nebu = "0.1"
 | [[lens]] | 1 + 2 (Field + Reduce) | commit: encode + hash. open: Fiat-Shamir challenges |
 | [[nox]] | 1 + 3 (Field + Spectral + Bits) | VM registers, NTT jets, comparison, bit ops |
 | [[zheng]] | 1 + 2 (Field + Reduce + Dot) | constraint evaluation, Fiat-Shamir, matrix products |
-| [[bbg]] | 1 (Field + Encode) | state polynomial serialization |
+| [[bbg]] | 1 (Field + Codec) | state polynomial serialization |
 | [[mudra]] | 1 + 4 (Field + Blind) | CSIDH key exchange, threshold protocols |
 
 ## workspace
 
 ```
 algebra/
-├── core/           strata-core           Semiring → Ring → Field + Encode
+├── core/           strata-core           Semiring → Ring → Field + Codec
 ├── proof/          strata-proof     Reduce + Dot
 ├── compute/        strata-compute   Spectral + Bits
 ├── ext/            strata-ext       Extension + Batch + Blind
