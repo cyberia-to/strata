@@ -125,17 +125,16 @@ impl Spectral for Goldilocks {
     /// p - 1 = 2^32 · (2^32 - 1), so two-adicity = 32.
     const TWO_ADICITY: u32 = 32;
 
-    /// 2^32-th root of unity: g^((p-1)/2^32) = g^(2^32 - 1).
-    const ROOT_OF_UNITY: Self = {
-        // Computed: 7^(2^32 - 1) mod p.
-        // This is a compile-time constant in practice; we store the precomputed value.
-        // For now, runtime compute in tests verifies correctness.
-        Goldilocks::new(185_u64) // placeholder — tests verify
-    };
+    /// 2^32-th root of unity: 7^((p-1)/2^32) = 7^(2^32 - 1) mod p.
+    ///
+    /// verified: ROOT_OF_UNITY^(2^32) = 1 mod p.
+    /// verified: ROOT_OF_UNITY^(2^31) ≠ 1 mod p (primitive).
+    const ROOT_OF_UNITY: Self = Goldilocks::new(0x185629DCDA58878C);
 
-    const ROOT_OF_UNITY_INV: Self = {
-        Goldilocks::new(186_u64) // placeholder — tests verify
-    };
+    /// inverse of the root of unity: ROOT_OF_UNITY^(-1) mod p.
+    ///
+    /// verified: ROOT_OF_UNITY * ROOT_OF_UNITY_INV = 1 mod p.
+    const ROOT_OF_UNITY_INV: Self = Goldilocks::new(0x76B6B635B6FC8719);
 
     const GENERATOR: Self = Goldilocks::new(G);
 }
@@ -200,3 +199,68 @@ impl Batch for Goldilocks {
 
 strata_core::test_field_axioms!(Goldilocks, goldilocks_axioms, |v: u64| Goldilocks::new(v)
     .canonicalize());
+
+#[cfg(test)]
+mod spectral_tests {
+    use super::*;
+    use strata_compute::Spectral;
+    use strata_core::Field;
+
+    #[test]
+    fn root_of_unity_order() {
+        // ROOT_OF_UNITY^(2^32) = 1
+        let mut r = Goldilocks::ROOT_OF_UNITY;
+        for _ in 0..32 {
+            r = r.square();
+        }
+        assert_eq!(r, Goldilocks::ONE, "root^(2^32) should be 1");
+    }
+
+    #[test]
+    fn root_of_unity_primitive() {
+        // ROOT_OF_UNITY^(2^31) ≠ 1
+        let mut r = Goldilocks::ROOT_OF_UNITY;
+        for _ in 0..31 {
+            r = r.square();
+        }
+        assert_ne!(r, Goldilocks::ONE, "root^(2^31) should NOT be 1 (primitive)");
+    }
+
+    #[test]
+    fn root_inv_product() {
+        assert_eq!(
+            Goldilocks::ROOT_OF_UNITY * Goldilocks::ROOT_OF_UNITY_INV,
+            Goldilocks::ONE,
+            "root * root_inv should be 1"
+        );
+    }
+
+    #[test]
+    fn generator_is_primitive_root() {
+        // g = 7 should be a primitive root of F_p*
+        // g^((p-1)/2) should be -1 (Euler criterion for primitive root)
+        let half_order = (P - 1) / 2;
+        let result = Goldilocks::GENERATOR.pow(half_order);
+        assert_eq!(result, Goldilocks::NEG_ONE, "generator^((p-1)/2) should be -1");
+    }
+
+    #[test]
+    fn root_of_unity_at_various_sizes() {
+        // root_of_unity(n) should have order exactly n
+        for log_n in 1..=20 {
+            let n = 1usize << log_n;
+            let omega = Goldilocks::root_of_unity(n);
+            // omega^n = 1
+            assert_eq!(omega.pow(n as u64), Goldilocks::ONE, "omega^{n} should be 1");
+            // omega^(n/2) ≠ 1 (primitive)
+            if n > 1 {
+                assert_ne!(
+                    omega.pow((n / 2) as u64),
+                    Goldilocks::ONE,
+                    "omega^({}/2) should NOT be 1",
+                    n
+                );
+            }
+        }
+    }
+}
