@@ -9,6 +9,7 @@
 //! - Fp3: F_{p³} = F_p[t] / (t³ − t − 1)   — recursive composition
 //! - Fp4: F_{p⁴} = F_p[w] / (w⁴ − 7)       — 256-bit security, recursion tower
 
+mod algebra_impl;
 pub mod fp2;
 pub mod fp3;
 pub mod fp4;
