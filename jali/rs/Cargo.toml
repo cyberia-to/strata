@@ -23,6 +23,11 @@ path = "src/lib.rs"
 [dependencies]
 strata-core.workspace = true
 nebu.workspace = true
+acpu = { version = "0.2", optional = true }
+
+[features]
+default = []
+fast = ["acpu"]
 
 [dev-dependencies]
 criterion.workspace = true

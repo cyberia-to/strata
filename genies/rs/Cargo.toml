@@ -19,6 +19,11 @@ path = "src/lib.rs"
 strata-core.workspace = true
 strata-proof.workspace = true
 strata-ext.workspace = true
+acpu = { version = "0.2", optional = true }
+
+[features]
+default = []
+fast = ["acpu"]
 
 [dev-dependencies]
 criterion.workspace = true
