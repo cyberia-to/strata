@@ -103,7 +103,7 @@ loop; algebras can override with hardware FMA or delayed modular reduction.
 nox (VM execution) and jali (ring arithmetic) need this.
 
 ```rust
-use strata_compute::{Spectral, Bits};
+use strata_compute::{Spectral, Packed, Bits};
 ```
 
 **Spectral** — a field with roots of unity. the spectral domain (NTT evaluation domain)
@@ -239,11 +239,11 @@ assert_eq!((a * a.inv()), Fq::ONE);
 | [strata-proof](proof/) | tier 2: Reduce, Dot |
 | [strata-compute](compute/) | tier 3: Spectral, Bits |
 | [strata-ext](ext/) | tier 4: Extension, Batch, Blind |
-| [cyb-nebu](nebu/rs/) | Goldilocks F_p (73 tests) |
-| [cyb-kuro](kuro/rs/) | F₂ binary tower (77 tests) |
+| [cyb-nebu](nebu/rs/) | Goldilocks F_p (154 tests) |
+| [cyb-kuro](kuro/rs/) | F₂ binary tower (87 tests) |
 | [cyb-jali](jali/rs/) | polynomial ring R_q (70 tests) |
-| [cyb-trop](trop/rs/) | tropical semiring (77 tests) |
-| [cyb-genies](genies/rs/) | isogeny curves F_q (55 tests) |
+| [cyb-trop](trop/rs/) | tropical semiring (87 tests) |
+| [cyb-genies](genies/rs/) | isogeny curves F_q (74 tests) |
 | [strata](src/) | facade: re-exports everything |
 
 ```toml
@@ -286,18 +286,18 @@ algebra/
 ├── ext/            strata-ext       Extension + Batch + Blind
 ├── src/            strata         facade
 ├── nebu/           Goldilocks F_p
-│   ├── rs/         core (73 tests)
+│   ├── rs/         core (154 tests)
 │   ├── wgsl/       GPU compute shaders
 │   ├── cli/        command-line tool
 │   ├── tri/        Trident ZK circuits
 │   └── specs/      canonical specs
-├── kuro/           F₂ binary tower (77 tests)
+├── kuro/           F₂ binary tower (87 tests)
 ├── jali/           polynomial ring R_q (70 tests)
-├── trop/           tropical semiring (77 tests)
-└── genies/         isogeny curves F_q (55 tests)
+├── trop/           tropical semiring (87 tests)
+└── genies/         isogeny curves F_q (74 tests)
 ```
 
-## 352 tests
+## 470 tests
 
 ```bash
 cargo test -p cyb-nebu -p cyb-kuro -p cyb-jali -p cyb-trop -p cyb-genies
