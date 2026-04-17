@@ -141,7 +141,7 @@ pub trait Field: Ring {
         let mut result = Self::ONE;
         while e > 0 {
             if e & 1 == 1 {
-                result = result * base;
+                result *= base;
             }
             base = base.square();
             e >>= 1;
@@ -159,7 +159,7 @@ pub trait Field: Ring {
             for bit in (0..64).rev() {
                 result = result.square();
                 if (limb >> bit) & 1 == 1 {
-                    result = result * self;
+                    result *= self;
                 }
             }
         }

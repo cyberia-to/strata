@@ -7,7 +7,6 @@ use strata_ext::Batch;
 use strata_proof::{Dot, Reduce};
 
 extern crate alloc;
-use alloc::vec::Vec;
 
 // ── tier 1 ───────────────────────────────────────────────────────
 
@@ -77,7 +76,8 @@ impl Batch for F2_128 {
 #[cfg(test)]
 mod f2_128_axioms {
     use super::*;
-    use strata_core::{Field, Semiring};
+    use alloc::vec::Vec;
+    use strata_core::Field;
 
     fn elems() -> Vec<F2_128> {
         (1..20u128).map(|i| F2_128(i * 0x1111)).collect()

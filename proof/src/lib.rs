@@ -58,7 +58,7 @@ pub trait Dot: Field {
         assert_eq!(a.len(), b.len());
         let mut acc = Self::ZERO;
         for (&ai, &bi) in a.iter().zip(b.iter()) {
-            acc = acc + ai * bi;
+            acc += ai * bi;
         }
         acc
     }

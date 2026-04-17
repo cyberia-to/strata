@@ -174,7 +174,7 @@ impl Batch for Goldilocks {
             if e == Self::ZERO {
                 prefix.push(acc);
             } else {
-                acc = acc * e;
+                acc *= e;
                 prefix.push(acc);
             }
         }
@@ -186,7 +186,7 @@ impl Batch for Goldilocks {
                 continue;
             }
             let inv_i = inv_acc * prefix[i - 1];
-            inv_acc = inv_acc * elements[i];
+            inv_acc *= elements[i];
             elements[i] = inv_i;
         }
         if elements[0] != Self::ZERO {

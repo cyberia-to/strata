@@ -107,7 +107,7 @@ impl Batch for Fq {
             if e == Self::ZERO {
                 prefix.push(acc);
             } else {
-                acc = acc * e;
+                acc *= e;
                 prefix.push(acc);
             }
         }
@@ -119,7 +119,7 @@ impl Batch for Fq {
                 continue;
             }
             let inv_i = inv_acc * prefix[i - 1];
-            inv_acc = inv_acc * elements[i];
+            inv_acc *= elements[i];
             elements[i] = inv_i;
         }
         if elements[0] != Self::ZERO {
@@ -141,8 +141,8 @@ impl Blind for Fq {
     fn ct_select(a: &Self, b: &Self, choice: bool) -> Self {
         let mask = if choice { u64::MAX } else { 0 };
         let mut result = [0u64; 8];
-        for i in 0..8 {
-            result[i] = (a.limbs[i] & mask) | (b.limbs[i] & !mask);
+        for (i, r) in result.iter_mut().enumerate() {
+            *r = (a.limbs[i] & mask) | (b.limbs[i] & !mask);
         }
         Fq::from_limbs(result)
     }

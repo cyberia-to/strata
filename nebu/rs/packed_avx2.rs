@@ -6,7 +6,7 @@
 //! Fallback: if AVX2 is not available at compile time, this module
 //! provides a portable 4-wide implementation using arrays.
 
-use crate::field::{EPSILON, Goldilocks, P};
+use crate::field::Goldilocks;
 use core::ops::{Add, AddAssign, Mul, MulAssign, Neg, Sub, SubAssign};
 use strata_compute::Packed;
 use strata_core::{Field, Ring, Semiring};
