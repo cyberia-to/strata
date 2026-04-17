@@ -12,18 +12,22 @@
 //!
 //! the name "spectral" comes from spectral methods in numerical analysis:
 //! transform between coefficient domain and evaluation domain, compute in
-//! whichever domain is cheaper, transform back. this is what NTT does
-//! for polynomial multiplication in jali and polynomial jets in nox.
+//! whichever domain is cheaper, transform back.
 //!
-//! Goldilocks has two-adicity 32 (p-1 is divisible by 2^32), giving
-//! roots of unity up to order 2^32 — enough for polynomials up to
-//! 4 billion terms. F₂¹²⁸ and F_q (CSIDH) lack this structure.
+//! ## Packed
+//!
+//! N field elements in one SIMD-width value. arithmetic operates on all N
+//! elements simultaneously. this is the single biggest performance lever
+//! for NTT, polynomial evaluation, and constraint checking.
+//!
+//! plonky3's entire speed advantage comes from packed field operations.
+//! the key insight: NTT butterflies, polynomial evaluations, and constraint
+//! checks are all element-wise — they parallelize perfectly across SIMD lanes.
 //!
 //! ## Bits
 //!
 //! decompose field elements into bits and reconstruct from bits.
 //! nox uses this for binary operations (comparison, shifts, masks).
-//! Binius (lens) uses this for binary constraint encoding.
 
 use strata_core::Field;
 
@@ -41,30 +45,70 @@ use strata_core::Field;
 /// - Tropical: not a field
 pub trait Spectral: Field {
     /// two-adicity: largest k such that 2^k divides |F*|.
-    /// Goldilocks: S = 32 (p - 1 = 2^32 · (2^32 - 1)).
     const TWO_ADICITY: u32;
 
     /// primitive 2^S-th root of unity.
-    /// ω^(2^S) = 1 and ω^(2^(S-1)) ≠ 1.
     const ROOT_OF_UNITY: Self;
 
-    /// inverse of the root of unity: ω^(-1).
+    /// inverse of the root of unity.
     const ROOT_OF_UNITY_INV: Self;
 
-    /// multiplicative generator of F* (a primitive root).
+    /// multiplicative generator of F*.
     const GENERATOR: Self;
 
     /// get a root of unity of order n.
     /// n must be a power of 2 and n ≤ 2^TWO_ADICITY.
-    /// returns ω^(2^S / n) — the principal n-th root of unity.
     fn root_of_unity(n: usize) -> Self {
         assert!(n.is_power_of_two());
         let log_n = n.trailing_zeros();
         assert!(log_n <= Self::TWO_ADICITY);
-        // ω^(2^S / n) = ω^(2^(S - log_n))
         let exp = 1u64 << (Self::TWO_ADICITY - log_n);
         Self::ROOT_OF_UNITY.pow(exp)
     }
+}
+
+/// N field elements packed into one SIMD-width value.
+///
+/// all arithmetic (add, sub, mul, neg) operates lane-wise on WIDTH elements
+/// simultaneously. this is the primary performance abstraction — NTT butterflies,
+/// polynomial evaluations, and constraint checks parallelize across lanes.
+///
+/// implementations:
+/// - Goldilocks: WIDTH=4 (AVX2, 4×64-bit) or WIDTH=1 (scalar fallback)
+/// - F₂: kuro's Packed128 already packs 128 elements per u128
+/// - Fq: WIDTH=1 (512-bit elements don't benefit from SIMD packing)
+///
+/// the trait extends Field so packed values support all field operations.
+/// the Scalar associated type is the unpacked element type.
+pub trait Packed: Field {
+    /// the unpacked scalar element type.
+    type Scalar: Field;
+
+    /// number of scalar elements per packed value.
+    const WIDTH: usize;
+
+    /// pack scalar elements from a slice.
+    /// slice length must be exactly WIDTH.
+    fn from_slice(slice: &[Self::Scalar]) -> Self;
+
+    /// unpack scalar elements into a slice.
+    /// slice length must be exactly WIDTH.
+    fn to_slice(&self, slice: &mut [Self::Scalar]);
+
+    /// broadcast one scalar to all lanes.
+    fn broadcast(val: Self::Scalar) -> Self;
+
+    /// extract the scalar at lane index.
+    fn extract(&self, index: usize) -> Self::Scalar;
+
+    /// interleave low halves of two packed values.
+    /// given [a0,a1,a2,a3] and [b0,b1,b2,b3], returns [a0,b0,a1,b1].
+    /// essential for NTT butterfly patterns.
+    fn interleave_low(self, other: Self) -> Self;
+
+    /// interleave high halves of two packed values.
+    /// given [a0,a1,a2,a3] and [b0,b1,b2,b3], returns [a2,b2,a3,b3].
+    fn interleave_high(self, other: Self) -> Self;
 }
 
 /// decompose field elements into bits and reconstruct.

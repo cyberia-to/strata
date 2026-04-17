@@ -24,7 +24,7 @@ pub use strata_core::*;
 pub use strata_proof::{Dot, Reduce};
 
 // tier 3: computation
-pub use strata_compute::{Bits, Spectral};
+pub use strata_compute::{Bits, Packed, Spectral};
 
 // tier 4: structure
 pub use strata_ext::{Batch, Blind, Extension};

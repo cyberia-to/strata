@@ -13,6 +13,7 @@ pub mod encoding;
 pub mod extension;
 pub mod field;
 pub mod ntt;
+pub mod packed;
 pub mod sqrt;
 
 #[cfg(test)]
@@ -20,3 +21,4 @@ mod vectors;
 
 pub use extension::{Fp2, Fp3, Fp4};
 pub use field::Goldilocks;
+pub use packed::PackedGoldilocks;
