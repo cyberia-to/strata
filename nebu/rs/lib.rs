@@ -17,6 +17,8 @@ pub mod packed;
 pub mod sqrt;
 
 #[cfg(test)]
+mod proptests;
+#[cfg(test)]
 mod vectors;
 
 pub use extension::{Fp2, Fp3, Fp4};

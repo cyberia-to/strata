@@ -223,7 +223,11 @@ mod spectral_tests {
         for _ in 0..31 {
             r = r.square();
         }
-        assert_ne!(r, Goldilocks::ONE, "root^(2^31) should NOT be 1 (primitive)");
+        assert_ne!(
+            r,
+            Goldilocks::ONE,
+            "root^(2^31) should NOT be 1 (primitive)"
+        );
     }
 
     #[test]
@@ -241,7 +245,11 @@ mod spectral_tests {
         // g^((p-1)/2) should be -1 (Euler criterion for primitive root)
         let half_order = (P - 1) / 2;
         let result = Goldilocks::GENERATOR.pow(half_order);
-        assert_eq!(result, Goldilocks::NEG_ONE, "generator^((p-1)/2) should be -1");
+        assert_eq!(
+            result,
+            Goldilocks::NEG_ONE,
+            "generator^((p-1)/2) should be -1"
+        );
     }
 
     #[test]
@@ -251,7 +259,11 @@ mod spectral_tests {
             let n = 1usize << log_n;
             let omega = Goldilocks::root_of_unity(n);
             // omega^n = 1
-            assert_eq!(omega.pow(n as u64), Goldilocks::ONE, "omega^{n} should be 1");
+            assert_eq!(
+                omega.pow(n as u64),
+                Goldilocks::ONE,
+                "omega^{n} should be 1"
+            );
             // omega^(n/2) ≠ 1 (primitive)
             if n > 1 {
                 assert_ne!(
