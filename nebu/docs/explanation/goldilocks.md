@@ -3,13 +3,6 @@ tags: cyber, cip
 crystal-type: entity
 crystal-domain: cyber
 alias: Goldilocks, Goldilocks prime, Goldilocks arithmetic, F_p, goldilocks, field choice, reduction, multiplication, inversion
-stake: 27174830290765380
-diffusion: 0.0012017391670251642
-springs: 0.0003233948039147658
-heat: 0.0006053419858528769
-focus: 0.0008189564218575767
-gravity: 13
-density: 0.67
 ---
 
 # the Goldilocks field

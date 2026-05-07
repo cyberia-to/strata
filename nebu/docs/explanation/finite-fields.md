@@ -3,12 +3,6 @@ tags: cyber, cip
 crystal-type: entity
 crystal-domain: cyber
 alias: finite field, prime field, field axioms, GF(p)
-diffusion: 0.00010722364868599256
-springs: 0.00039984814138527064
-heat: 0.00031880238603150676
-focus: 0.00023732674396487576
-gravity: 0
-density: 0.58
 ---
 
 # finite fields

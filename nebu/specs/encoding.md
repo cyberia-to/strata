@@ -3,12 +3,6 @@ tags: cyber, cip
 crystal-type: entity
 crystal-domain: cyber
 alias: field encoding, byte encoding, 7-byte encoding
-diffusion: 0.00010722364868599256
-springs: 0.00047801673096328084
-heat: 0.0003691962956304392
-focus: 0.0002708561027580649
-gravity: 0
-density: 0.8
 ---
 
 # encoding specification

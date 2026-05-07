@@ -3,12 +3,6 @@ tags: cyber, cip
 crystal-type: entity
 crystal-domain: cyber
 alias: applications, STARK, FHE, field applications, zero knowledge
-diffusion: 0.0037062607285364155
-springs: 0.0002162379527362023
-heat: 0.001309392885284446
-focus: 0.0021798803271459296
-gravity: 85
-density: 0.85
 ---
 
 # applications

@@ -3,12 +3,6 @@ tags: cyber, cip
 crystal-type: entity
 crystal-domain: cyber
 alias: modular arithmetic, congruence, residue classes, mod p
-diffusion: 0.00016580159983383091
-springs: 0.0001399793337241195
-heat: 0.00016408495493343376
-focus: 0.00015771159102083603
-gravity: 1
-density: 0.17
 ---
 
 # modular arithmetic

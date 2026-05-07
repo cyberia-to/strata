@@ -3,12 +3,6 @@ tags: cyber, cip
 crystal-type: entity
 crystal-domain: cyber
 alias: NTT, Number Theoretic Transform, roots of unity
-diffusion: 0.001352506934660513
-springs: 0.00036690125119552303
-heat: 0.0006783303485014985
-focus: 0.0009219899123892011
-gravity: 12
-density: 0.89
 ---
 
 # NTT specification

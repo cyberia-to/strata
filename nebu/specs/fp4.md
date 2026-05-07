@@ -3,12 +3,6 @@ tags: cyber, cip
 crystal-type: entity
 crystal-domain: cyber
 alias: quartic extension, F_p⁴, Fp4
-diffusion: 0.0005830459640314197
-springs: 0.00020214262964505256
-heat: 0.0003395497564318387
-focus: 0.00042007572219558795
-gravity: 4
-density: 0.78
 ---
 
 # quartic extension field specification

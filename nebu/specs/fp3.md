@@ -3,12 +3,6 @@ tags: cyber, cip
 crystal-type: entity
 crystal-domain: cyber
 alias: cubic extension, F_p³, Fp3
-diffusion: 0.0005508626584596788
-springs: 0.00019911162716400538
-heat: 0.0003362126806170614
-focus: 0.00040240735350244804
-gravity: 4
-density: 0.71
 ---
 
 # cubic extension field specification

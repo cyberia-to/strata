@@ -3,12 +3,6 @@ tags: cyber, cip
 crystal-type: entity
 crystal-domain: cyber
 alias: nebu explanation, field encyclopedia
-diffusion: 0.00010722364868599256
-springs: 0.0003718815264935351
-heat: 0.00030996176623186564
-focus: 0.00022716863553742702
-gravity: 0
-density: 2.03
 ---
 
 # finite field arithmetic

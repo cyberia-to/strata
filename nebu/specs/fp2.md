@@ -3,12 +3,6 @@ tags: cyber, cip
 crystal-type: entity
 crystal-domain: cyber
 alias: quadratic extension, F_p², extension field, Fp2
-diffusion: 0.0013651161170082113
-springs: 0.00021566140233459524
-heat: 0.0005858798587450669
-focus: 0.0008644324509534864
-gravity: 9
-density: 0.96
 ---
 
 # quadratic extension field specification

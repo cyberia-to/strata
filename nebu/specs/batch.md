@@ -3,12 +3,6 @@ tags: cyber, cip
 crystal-type: entity
 crystal-domain: cyber
 alias: batch inversion, Montgomery's trick, simultaneous inversion
-diffusion: 0.00010722364868599256
-springs: 0.0005931823714880819
-heat: 0.0004631115060868785
-focus: 0.0003241888370067924
-gravity: 0
-density: 0.32
 ---
 
 # batch inversion specification

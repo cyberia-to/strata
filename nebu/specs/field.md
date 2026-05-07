@@ -3,12 +3,6 @@ tags: cyber, cip
 crystal-type: entity
 crystal-domain: cyber
 alias: Goldilocks field, Goldilocks prime, F_p, field specification
-diffusion: 0.0015825387348163517
-springs: 0.00013365308300601137
-heat: 0.0005946386474714702
-focus: 0.0009502930218042611
-gravity: 68
-density: 0.92
 ---
 
 # field specification

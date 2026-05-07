@@ -3,12 +3,6 @@ tags: cyber, cip
 crystal-type: entity
 crystal-domain: cyber
 alias: NTT theory, Number Theoretic Transform, FFT over finite fields, polynomial multiplication
-diffusion: 0.00010722364868599256
-springs: 0.00043606680862567747
-heat: 0.0003517925405885429
-focus: 0.0002547903750484048
-gravity: 0
-density: 0.27
 ---
 
 # NTT theory

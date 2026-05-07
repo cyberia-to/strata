@@ -3,12 +3,6 @@ tags: cyber, cip
 crystal-type: entity
 crystal-domain: cyber
 alias: polynomial arithmetic, polynomial evaluation, interpolation, Lagrange, Reed-Solomon
-diffusion: 0.00010722364868599256
-springs: 0.0006575138792249028
-heat: 0.0004999265842514629
-focus: 0.00035085130496075517
-gravity: 0
-density: 0.17
 ---
 
 # polynomial arithmetic

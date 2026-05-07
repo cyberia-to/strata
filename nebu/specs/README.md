@@ -3,12 +3,6 @@ tags: cyber, cip
 crystal-type: entity
 crystal-domain: cyber
 alias: nebu reference, nebu specification
-diffusion: 0.00010722364868599256
-springs: 0.0003405697993500444
-heat: 0.00028171152949721216
-focus: 0.0002121250700474493
-gravity: 0
-density: 7.29
 ---
 
 # nebu specification

@@ -4,12 +4,6 @@ crystal-type: entity
 crystal-domain: cyber
 alias: GFP, Goldilocks Field Processor, hardware primitives
 status: proposal
-diffusion: 0.0021435396809766157
-springs: 0.00018951670935407302
-heat: 0.0008060749147709153
-focus: 0.0012898398362486962
-gravity: 26
-density: 1.74
 ---
 
 # hardware specification
