@@ -551,7 +551,7 @@ plus NTT (Number Theoretic Transform) over roots of unity.
 | nebu | `~/git/nebu/` | Goldilocks field arithmetic (this repo) |
 | hemera | `~/git/hemera/` | hash function (Poseidon2), depends on nebu |
 | nox | `~/git/nox/` | VM, depends on nebu + hemera |
-| zheng | `~/git/zheng/` | proof system (SuperSpartan + WHIR) |
+| zheng | `~/git/zheng/` | proof system (SuperSpartan + Brakedown) |
 | mudra | `~/git/mudra/` | crypto primitives (KEM, dCTIDH, TFHE, threshold) |
 | bbg | `~/git/bbg/` | authenticated state (Big Badass Graph) |
 | trident | `~/git/trident/` | language, compiles to nox |

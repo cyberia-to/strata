@@ -153,6 +153,6 @@ one fused operation: one multiplication and two additions. the twiddle factor ω
 | system | NTT role | typical length |
 |--------|----------|----------------|
 | STARK prover | polynomial evaluation/interpolation | 2¹⁸ − 2²⁴ |
-| [[WHIR]] | polynomial commitment | 2¹⁶ − 2²⁰ |
+| [[Brakedown]] | polynomial commitment | 2¹⁶ − 2²⁰ |
 | [[TFHE]] | ciphertext multiplication in R_p | 2¹⁰ − 2¹⁴ |
 | [[hemera]] bootstrap | round constant generation (indirect) | — |
