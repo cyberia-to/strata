@@ -14,8 +14,8 @@ pub mod extension;
 pub mod field;
 pub mod ntt;
 pub mod packed;
-pub mod poly;
 pub mod packed_avx2;
+pub mod poly;
 pub mod sqrt;
 
 #[cfg(test)]
