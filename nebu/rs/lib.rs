@@ -14,6 +14,7 @@ pub mod extension;
 pub mod field;
 pub mod ntt;
 pub mod packed;
+pub mod poly;
 pub mod packed_avx2;
 pub mod sqrt;
 
@@ -26,3 +27,4 @@ pub use extension::{Fp2, Fp3, Fp4};
 pub use field::Goldilocks;
 pub use packed::PackedGoldilocks;
 pub use packed_avx2::PackedGoldilocks4;
+pub use poly::multilinear_eval;
