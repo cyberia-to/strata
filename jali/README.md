@@ -63,6 +63,19 @@ the same criterion that separates kuro (32x for binary), trop (10x for optimizat
 
 n must be a power of 2 (NTT requirement) and must divide 2^32 (Goldilocks two-adicity). all three values satisfy both constraints.
 
+## workloads
+
+| domain | mechanism |
+|--------|-----------|
+| [[TFHE]] ciphertexts | encrypt/decrypt over R_q, programmable bootstrapping |
+| lattice [[KEM]] ([[seal]]) | Module-RLWE key encapsulation over R_q |
+| blind rotation | n polynomial multiplies during FHE bootstrapping |
+| key switching | Galois automorphisms of R_q (slot permutation) |
+| noise tracking | bound estimation through ring operations |
+| convolution | native polynomial multiply = convolution |
+
+[[nox]] Layer 3 jets: `jet_ntt_batch`, `jet_key_switch`, `jet_gadget_decomp`, `jet_noise_track`, `jet_blind_rotate`. ring operations prove via PCS₃ (ring-aware [[Brakedown]] with NTT batching); HyperNova folds into the [[Goldilocks field|Goldilocks]] accumulator.
+
 ## structure
 
 ```

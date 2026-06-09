@@ -38,6 +38,25 @@ no known construction achieves all three over [[Goldilocks field|Goldilocks]]. t
 | encode(E) | curve to 64 bytes | x-coordinate + sign |
 | fold(x) | F_q element to 8 Goldilocks limbs | for zheng proofs |
 
+## privacy applications
+
+one commutative group action gives the whole privacy toolkit non-interactively:
+
+| application | what it enables |
+|-------------|-----------------|
+| stealth addresses | receiver-anonymous payments |
+| non-interactive key exchange | shared secret without interaction |
+| verifiable random functions | deterministic randomness with proof |
+| verifiable delay functions | time proofs (sequential computation) |
+| threshold protocols | t-of-n key generation, signing |
+| oblivious transfer | sender sends N, receiver gets 1 |
+| blind signatures | signer signs without seeing the message |
+| ring signatures | sign as "one of a group" anonymously |
+| anonymous credentials | prove attributes without revealing identity |
+| updatable encryption | re-encrypt without decrypting |
+
+[[nox]] Layer 3 jets: `jet_genies_action`, `jet_genies_dh`, `jet_genies_vrf`, `jet_genies_vdf`, `jet_genies_threshold`, `jet_genies_blind`. the shadow executes over F_q; the proof folds into the [[nebu]] accumulator.
+
 ## structure
 
 ```
