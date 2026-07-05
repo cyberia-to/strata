@@ -3,6 +3,7 @@ resolver = "3"
 members = [
     "core", "proof", "compute", "ext",
     "src",
+    "cli",
     "nebu/rs", "nebu/wgsl", "nebu/cli",
     "kuro/rs", "kuro/wgsl", "kuro/cli",
     "jali/rs", "jali/wgsl", "jali/cli",
