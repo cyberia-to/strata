@@ -19,11 +19,11 @@ repository = "https://github.com/cyberia-to/strata"
 rust-version = "1.89"
 
 [workspace.dependencies]
-# tier crates
-strata-core = { path = "core" }
-strata-proof = { path = "proof" }
-strata-compute = { path = "compute" }
-strata-ext = { path = "ext" }
+# tier crates — version+path so `cargo publish` can resolve after crates.io upload
+strata-core = { version = "0.1.0", path = "core" }
+strata-proof = { version = "0.1.0", path = "proof" }
+strata-compute = { version = "0.1.0", path = "compute" }
+strata-ext = { version = "0.1.0", path = "ext" }
 
 # algebra crates
 nebu = { version = "0.1.0", path = "nebu/rs", package = "cyb-nebu" }
