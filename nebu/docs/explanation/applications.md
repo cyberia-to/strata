@@ -94,7 +94,7 @@ program → arithmetic circuit → trace → commitment → proof
     └──────── verifier checks proof (O(log² N)) ───────┘
 ```
 
-[[trident]] compiles programs to arithmetic circuits over the Goldilocks field. [[nox]] executes these circuits and produces the execution trace. [[hemera]] hashes the trace for commitment. the STARK prover generates the proof.
+[[trident]] compiles programs to arithmetic circuits over the Goldilocks field. [[nox]] executes these circuits and produces the execution trace. [[hemera]] hashes the trace for commitment. the [[zheng]] prover generates the proof.
 
 every component speaks Goldilocks. no field conversion at any boundary. this is the universal substrate property: one field for compilation, execution, hashing, and proving.
 
