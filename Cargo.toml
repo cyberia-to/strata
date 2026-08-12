@@ -26,11 +26,11 @@ strata-compute = { version = "0.1.0", path = "compute" }
 strata-ext = { version = "0.1.0", path = "ext" }
 
 # algebra crates
-nebu = { version = "0.1.0", path = "nebu/rs", package = "cyb-nebu" }
-kuro = { version = "0.1.0", path = "kuro/rs", package = "cyb-kuro" }
-jali = { version = "0.1.0", path = "jali/rs", package = "cyb-jali" }
-trop = { version = "0.1.0", path = "trop/rs", package = "cyb-trop" }
-genies = { version = "0.1.0", path = "genies/rs", package = "cyb-genies" }
+nebu = { version = "0.1.0", path = "nebu/rs", package = "strata-nebu" }
+kuro = { version = "0.1.0", path = "kuro/rs", package = "strata-kuro" }
+jali = { version = "0.1.0", path = "jali/rs", package = "strata-jali" }
+trop = { version = "0.1.0", path = "trop/rs", package = "strata-trop" }
+genies = { version = "0.1.0", path = "genies/rs", package = "strata-genies" }
 nebu-wgsl = { path = "nebu/wgsl" }
 kuro-wgsl = { path = "kuro/wgsl" }
 jali-wgsl = { path = "jali/wgsl" }

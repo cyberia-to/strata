@@ -4,7 +4,7 @@
 # crystal-domain: comp
 # ---
 [package]
-name = "cyb-nebu"
+name = "strata-nebu"
 version.workspace = true
 edition.workspace = true
 license-file = "../../LICENSE"
