@@ -96,7 +96,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
       - uses: Swatinem/rust-cache@v2
-      - run: cargo test -p cyb-nebu -p cyb-kuro -p cyb-jali -p cyb-trop -p cyb-genies
+      - run: cargo test -p strata-nebu -p strata-kuro -p strata-jali -p strata-trop -p strata-genies
 
   clippy:
     runs-on: ubuntu-latest
@@ -247,11 +247,11 @@ roadmap/
 - `strata-proof`: Reduce, Dot traits
 - `strata-compute`: Spectral, Packed, Bits traits
 - `strata-ext`: Extension, Batch, Blind traits
-- `cyb-nebu`: Goldilocks F_p, NTT, Fp2/Fp3/Fp4, AVX2
-- `cyb-kuro`: F₂¹²⁸ binary tower
-- `cyb-jali`: polynomial ring R_q
-- `cyb-trop`: tropical semiring (min,+)
-- `cyb-genies`: F_q CSIDH-512, constant-time Blind ops
+- `strata-nebu`: Goldilocks F_p, NTT, Fp2/Fp3/Fp4, AVX2
+- `strata-kuro`: F₂¹²⁸ binary tower
+- `strata-jali`: polynomial ring R_q
+- `strata-trop`: tropical semiring (min,+)
+- `strata-genies`: F_q CSIDH-512, constant-time Blind ops
 - `strata`: facade
 - GPU backends (WGSL) and CLI tools for each algebra
 ```
@@ -348,18 +348,18 @@ cargo publish -p strata-proof
 cargo publish -p strata-compute
 cargo publish -p strata-ext
 
-# Layer 3 (cyb-jali depends on nebu; publish it last)
-cargo publish -p cyb-trop
-cargo publish -p cyb-nebu
-cargo publish -p cyb-kuro
-cargo publish -p cyb-genies
-cargo publish -p cyb-jali
+# Layer 3 (strata-jali depends on nebu; publish it last)
+cargo publish -p strata-trop
+cargo publish -p strata-nebu
+cargo publish -p strata-kuro
+cargo publish -p strata-genies
+cargo publish -p strata-jali
 
 # Layer 4
 cargo publish -p strata
 ```
 
-WGSL/CLI crates: publish alongside their algebra (cyb-nebu-wgsl, cyb-nebu-cli, etc.)
+WGSL/CLI crates: publish alongside their algebra (strata-nebu-wgsl, strata-nebu-cli, etc.)
 after confirming they compile cleanly and docs build.
 
 ### Pre-publish check per crate
