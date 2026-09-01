@@ -1,3 +1,10 @@
+---
+title: nebu
+tags: cyber, soft3, core
+alias: nebu, nebu field library, strata-nebu
+crystal-type: entity
+crystal-domain: cyber
+---
 # nebu
 
 Goldilocks field arithmetic for [[cyber]]. the single prime that unifies the entire stack — from virtual machine execution to hash functions to polynomial commitments to proof generation.
