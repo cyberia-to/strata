@@ -1,0 +1,14 @@
+# ---
+# tags: strata, config
+# crystal-type: source
+# crystal-domain: comp
+# ---
+[package]
+name = "strata-cli"
+version.workspace = true
+edition.workspace = true
+publish = false
+
+[[bin]]
+name = "strata"
+path = "src/main.rs"

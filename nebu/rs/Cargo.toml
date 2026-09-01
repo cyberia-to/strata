@@ -4,7 +4,7 @@
 # crystal-domain: comp
 # ---
 [package]
-name = "cyb-nebu"
+name = "strata-nebu"
 version.workspace = true
 edition.workspace = true
 license-file = "../../LICENSE"
@@ -28,7 +28,9 @@ strata-ext.workspace = true
 acpu = { version = "0.2", optional = true }
 
 [features]
-default = ["fast"]
+# acpu/unimem are Apple-only; keep off by default so linux cross-builds
+# of downstream crates (lytics-ingest, etc.) resolve. enable: --features fast
+default = []
 fast = ["acpu"]
 
 [dev-dependencies]
