@@ -26,12 +26,15 @@ strata-proof.workspace = true
 strata-compute.workspace = true
 strata-ext.workspace = true
 acpu = { version = "0.2", optional = true }
+serde = { version = "1", optional = true, default-features = false }
 
 [features]
 # acpu/unimem are Apple-only; keep off by default so linux cross-builds
 # of downstream crates (lytics-ingest, etc.) resolve. enable: --features fast
 default = []
 fast = ["acpu"]
+# canonical-u64 wire form for Goldilocks (no_std-compatible)
+serde = ["dep:serde"]
 
 [dev-dependencies]
 criterion.workspace = true
