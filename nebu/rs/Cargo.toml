@@ -26,10 +26,13 @@ strata-proof.workspace = true
 strata-compute.workspace = true
 strata-ext.workspace = true
 acpu = { version = "0.2", optional = true }
+serde = { version = "1", optional = true, default-features = false }
 
 [features]
 default = ["fast"]
 fast = ["acpu"]
+# canonical-u64 wire form for Goldilocks (no_std-compatible)
+serde = ["dep:serde"]
 
 [dev-dependencies]
 criterion.workspace = true
