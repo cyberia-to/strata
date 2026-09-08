@@ -23,6 +23,29 @@ pub struct Goldilocks {
     value: u64,
 }
 
+// ── serde: canonical u64 wire form ───────────────────────────────
+//
+// Serializes as the canonical residue (as_u64, in [0, p)); rejects
+// non-canonical values on deserialize so every wire form is unique.
+
+#[cfg(feature = "serde")]
+impl serde::Serialize for Goldilocks {
+    fn serialize<S: serde::Serializer>(&self, s: S) -> Result<S::Ok, S::Error> {
+        s.serialize_u64(self.as_u64())
+    }
+}
+
+#[cfg(feature = "serde")]
+impl<'de> serde::Deserialize<'de> for Goldilocks {
+    fn deserialize<D: serde::Deserializer<'de>>(d: D) -> Result<Self, D::Error> {
+        let v = u64::deserialize(d)?;
+        if v >= P {
+            return Err(serde::de::Error::custom("non-canonical Goldilocks element"));
+        }
+        Ok(Goldilocks::new(v))
+    }
+}
+
 impl Goldilocks {
     pub const ZERO: Self = Self { value: 0 };
     pub const ONE: Self = Self { value: 1 };
