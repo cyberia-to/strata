@@ -1,5 +1,5 @@
 [package]
-name = "cyb-genies"
+name = "strata-genies"
 version.workspace = true
 edition.workspace = true
 license-file = "../../LICENSE"

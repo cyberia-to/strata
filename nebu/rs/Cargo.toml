@@ -4,7 +4,7 @@
 # crystal-domain: comp
 # ---
 [package]
-name = "cyb-nebu"
+name = "strata-nebu"
 version.workspace = true
 edition.workspace = true
 license-file = "../../LICENSE"
@@ -29,7 +29,9 @@ acpu = { version = "0.2", optional = true }
 serde = { version = "1", optional = true, default-features = false }
 
 [features]
-default = ["fast"]
+# acpu/unimem are Apple-only; keep off by default so linux cross-builds
+# of downstream crates (lytics-ingest, etc.) resolve. enable: --features fast
+default = []
 fast = ["acpu"]
 # canonical-u64 wire form for Goldilocks (no_std-compatible)
 serde = ["dep:serde"]

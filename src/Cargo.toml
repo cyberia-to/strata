@@ -1,6 +1,6 @@
 [package]
-name = "strata"
-version.workspace = true
+name = "cyber-strata"
+version = "0.1.1"
 edition.workspace = true
 license-file = "../LICENSE"
 description = "five algebraic backends for verifiable computation"

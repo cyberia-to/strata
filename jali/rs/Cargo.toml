@@ -4,7 +4,7 @@
 # crystal-domain: comp
 # ---
 [package]
-name = "cyb-jali"
+name = "strata-jali"
 version.workspace = true
 edition.workspace = true
 license-file = "../../LICENSE"
