@@ -866,21 +866,51 @@ fn bench_op<F: FnMut()>(name: &str, iters: u64, mut f: F) {
 // ── hex helpers ────────────────────────────────────────────────────
 
 fn decode_hex(s: &str) -> Vec<u8> {
+    match try_decode_hex(s) {
+        Ok(bytes) => bytes,
+        Err(msg) => {
+            eprintln!("{msg}");
+            std::process::exit(1);
+        }
+    }
+}
+
+fn try_decode_hex(s: &str) -> Result<Vec<u8>, String> {
     let s = s
         .strip_prefix("0x")
         .or_else(|| s.strip_prefix("0X"))
         .unwrap_or(s);
+    if !s.is_ascii() {
+        return Err("hex string must be ASCII".to_string());
+    }
     if s.len() % 2 != 0 {
-        eprintln!("hex string must have even length");
-        std::process::exit(1);
+        return Err("hex string must have even length".to_string());
     }
     (0..s.len())
         .step_by(2)
         .map(|i| {
-            u8::from_str_radix(&s[i..i + 2], 16).unwrap_or_else(|e| {
-                eprintln!("invalid hex at position {i}: {e}");
-                std::process::exit(1);
-            })
+            u8::from_str_radix(&s[i..i + 2], 16)
+                .map_err(|e| format!("invalid hex at position {i}: {e}"))
         })
         .collect()
+}
+
+#[cfg(test)]
+mod hex_tests {
+    use super::*;
+
+    #[test]
+    fn rejects_non_ascii_without_panicking() {
+        // a multi-byte UTF-8 char keeps the byte length even (so the
+        // even-length guard does not catch it) while landing a
+        // `&s[i..i+2]` slice boundary mid-character; try_decode_hex must
+        // error, not panic.
+        assert!(try_decode_hex("aéb").is_err());
+    }
+
+    #[test]
+    fn accepts_valid_hex_with_and_without_prefix() {
+        assert_eq!(try_decode_hex("0x00ff").unwrap(), vec![0x00, 0xff]);
+        assert_eq!(try_decode_hex("00ff").unwrap(), vec![0x00, 0xff]);
+    }
 }
