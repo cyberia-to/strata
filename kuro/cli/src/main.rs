@@ -415,26 +415,34 @@ fn cmd_calc(forced: Option<Backend>, args: &[String]) {
     }
 }
 
+fn try_encode_hex(raw: &str) -> Result<(String, Vec<u8>), String> {
+    let input = raw
+        .strip_prefix("0x")
+        .or_else(|| raw.strip_prefix("0X"))
+        .unwrap_or(raw);
+    if !input.is_ascii() {
+        return Err("hex string must be ASCII".to_string());
+    }
+    if input.len() % 2 != 0 {
+        return Err("hex string must have even length".to_string());
+    }
+    let bytes = (0..input.len())
+        .step_by(2)
+        .map(|i| {
+            u8::from_str_radix(&input[i..i + 2], 16)
+                .map_err(|e| format!("invalid hex byte '{}': {e}", &input[i..i + 2]))
+        })
+        .collect::<Result<Vec<u8>, String>>()?;
+    Ok((input.to_lowercase(), bytes))
+}
+
 fn cmd_encode(args: &[String]) {
     if args.is_empty() {
         die("usage: kuro encode <hex_bytes>\n  hex_bytes: even-length hex string");
     }
-    let input = args[0]
-        .strip_prefix("0x")
-        .or_else(|| args[0].strip_prefix("0X"))
-        .unwrap_or(&args[0]);
-    if input.len() % 2 != 0 {
-        die("error: hex string must have even length");
-    }
-    let bytes: Vec<u8> = (0..input.len())
-        .step_by(2)
-        .map(|i| {
-            u8::from_str_radix(&input[i..i + 2], 16)
-                .unwrap_or_else(|e| die(&format!("invalid hex byte '{}': {e}", &input[i..i + 2])))
-        })
-        .collect();
+    let (input, bytes) = try_encode_hex(&args[0]).unwrap_or_else(|e| die(&format!("error: {e}")));
 
-    println!("input: {} ({} bytes)", input.to_lowercase(), bytes.len());
+    println!("input: {input} ({} bytes)", bytes.len());
     for (i, chunk) in bytes.chunks(16).enumerate() {
         let mut val: u128 = 0;
         for (j, &b) in chunk.iter().enumerate() {
@@ -614,4 +622,37 @@ fn bench_op<F: Fn() -> T, T>(label: &str, iters: u64, f: F) {
     }
     let ns = t.elapsed().as_nanos() as f64 / iters as f64;
     println!("  {label}  {ns:>8.1} ns/op");
+}
+
+#[cfg(test)]
+mod try_encode_hex_tests {
+    use super::*;
+
+    #[test]
+    fn rejects_non_ascii_without_panicking() {
+        // "aébbb" is 6 bytes (a=1, é=2, b=1, b=1, b=1): the even-length
+        // guard does not catch it, but stepping by 2 lands a `&s[i..i+2]`
+        // slice boundary at byte index 2, inside é's 2-byte encoding.
+        // try_encode_hex must error, not panic.
+        assert!(try_encode_hex("aébbb").is_err());
+    }
+
+    #[test]
+    fn accepts_valid_hex_with_and_without_prefix() {
+        let (input, bytes) = try_encode_hex("0x00Ff").unwrap();
+        assert_eq!(bytes, vec![0x00, 0xff]);
+        assert_eq!(input, "00ff");
+        let (_, bytes) = try_encode_hex("00ff").unwrap();
+        assert_eq!(bytes, vec![0x00, 0xff]);
+    }
+
+    #[test]
+    fn rejects_odd_length() {
+        assert!(try_encode_hex("abc").is_err());
+    }
+
+    #[test]
+    fn rejects_invalid_hex_digit() {
+        assert!(try_encode_hex("zz").is_err());
+    }
 }
