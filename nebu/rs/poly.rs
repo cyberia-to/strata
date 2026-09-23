@@ -39,12 +39,12 @@ use crate::field::Goldilocks;
 ///
 /// Allocation-free: only stack frames proportional to `point.len()`.
 pub fn multilinear_eval(evals: &[Goldilocks], point: &[Goldilocks]) -> Goldilocks {
-    debug_assert_eq!(
+    assert_eq!(
         evals.len(),
         1usize << point.len(),
         "evals.len() must equal 2^point.len()"
     );
-    debug_assert!(!evals.is_empty(), "evals must be non-empty");
+    assert!(!evals.is_empty(), "evals must be non-empty");
 
     if point.is_empty() {
         return evals[0];
@@ -132,4 +132,23 @@ mod tests {
         // vl = 10+2*10=30; vr = 30+2*10=50; out = 30 + 0*(50-30) = 30
         assert_eq!(result, g(30));
     }
+
+    // These invariants were `debug_assert!`, compiled out in release: a
+    // mismatched (evals, point) pair recurses on the wrong split instead of
+    // failing at the point of the bug, silently returning a value for a
+    // different polynomial than the caller specified — `multilinear_eval`
+    // is re-exported at the crate root (`pub use poly::multilinear_eval`),
+    // so a caller outside this crate can reach it with any lengths.
+
+    #[test]
+    #[should_panic(expected = "evals.len() must equal 2^point.len()")]
+    fn panics_on_length_mismatch() {
+        let evals = [g(1), g(2), g(3)]; // 3 is not 2^point.len() for any point
+        let _ = multilinear_eval(&evals, &[g(0)]);
+    }
+
+    // The second check (`evals must be non-empty`) can never fire on its
+    // own: `1usize << point.len()` is always >= 1, so the length check
+    // above already rejects `evals.is_empty()` first. Confirmed by reading,
+    // not exercised — kept as defense in depth rather than removed.
 }
