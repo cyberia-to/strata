@@ -53,14 +53,22 @@ impl TropMatrix {
     /// Get the element at (i, j).
     #[inline]
     pub fn get(&self, i: usize, j: usize) -> Tropical {
-        debug_assert!(i < self.n && j < self.n);
+        assert!(
+            i < self.n && j < self.n,
+            "TropMatrix::get index ({i}, {j}) out of bounds for {0}x{0} matrix",
+            self.n
+        );
         self.data[i * MAX_DIM + j]
     }
 
     /// Set the element at (i, j).
     #[inline]
     pub fn set(&mut self, i: usize, j: usize, val: Tropical) {
-        debug_assert!(i < self.n && j < self.n);
+        assert!(
+            i < self.n && j < self.n,
+            "TropMatrix::set index ({i}, {j}) out of bounds for {0}x{0} matrix",
+            self.n
+        );
         self.data[i * MAX_DIM + j] = val;
     }
 
