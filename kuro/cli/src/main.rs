@@ -305,7 +305,24 @@ fn gpu_unary(ctx: &Ctx, op: &str, a: u128, level: u32) -> u128 {
 
 // -- CPU tower ops -----------------------------------------------------------
 
+/// True when truncating `a` down to `level` bits — the `$val as _` cast
+/// `tower_unary`'s `run!` macro applies before constructing the field
+/// element — collapses a nonzero `a` to zero. `cmd_calc`'s `a == 0` guard
+/// runs on the untruncated `u128` and cannot see this: an `a` whose low
+/// `level` bits are all zero but whose higher bits are set (e.g.
+/// `0x1_0000_0000` at `--level 32`) passes that guard yet still reaches
+/// `inv()` on the zero element of the target field.
+fn truncates_to_zero(a: u128, level: u32) -> bool {
+    let mask: u128 = if level >= 128 { u128::MAX } else { (1u128 << level) - 1 };
+    a != 0 && (a & mask) == 0
+}
+
 fn tower_unary(op: &str, a: u128, level: u32) -> u128 {
+    if op == "inv" && truncates_to_zero(a, level) {
+        die(&format!(
+            "error: inverse of zero is undefined ({a:#x} truncates to zero at --level {level})"
+        ));
+    }
     macro_rules! run {
         ($ty:ident, $val:expr) => {{
             let x = $ty($val as _);
@@ -614,4 +631,60 @@ fn bench_op<F: Fn() -> T, T>(label: &str, iters: u64, f: F) {
     }
     let ns = t.elapsed().as_nanos() as f64 / iters as f64;
     println!("  {label}  {ns:>8.1} ns/op");
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn zero_is_zero_at_every_level() {
+        for &level in &[2, 4, 8, 16, 32, 64, 128] {
+            assert!(!truncates_to_zero(0, level), "0 itself is caught by the a == 0 guard, not this one");
+        }
+    }
+
+    #[test]
+    fn nonzero_low_bits_never_truncate_to_zero() {
+        for &level in &[2, 4, 8, 16, 32, 64, 128] {
+            assert!(!truncates_to_zero(1, level));
+        }
+    }
+
+    #[test]
+    fn high_bits_only_truncate_to_zero_below_the_bit_they_set() {
+        // 0x1_0000_0000 has bit 32 set, bits 0..32 all zero: truncating to
+        // any level <= 32 bits keeps only zero bits, but level 64/128 keep
+        // bit 32 itself, so the value survives truncation there.
+        let a = 1u128 << 32;
+        for &level in &[2, 4, 8, 16, 32] {
+            assert!(truncates_to_zero(a, level), "level {level} should truncate {a:#x} to zero");
+        }
+        for &level in &[64, 128] {
+            assert!(!truncates_to_zero(a, level), "level {level} should not truncate {a:#x} to zero");
+        }
+    }
+
+    #[test]
+    fn full_width_value_never_truncates_to_zero_at_128() {
+        assert!(!truncates_to_zero(u128::MAX, 128));
+    }
+
+    #[test]
+    fn value_within_level_width_never_truncates_to_zero() {
+        // A value that already fits within `level` bits and is nonzero
+        // survives truncation unchanged, so it must never be flagged.
+        for &level in &[2, 4, 8, 16, 32, 64] {
+            let max_in_level = (1u128 << level) - 1;
+            assert!(!truncates_to_zero(max_in_level, level));
+        }
+    }
+
+    #[test]
+    fn tower_unary_inv_unaffected_for_non_truncating_input() {
+        // Regression: the new guard must not reject ordinary in-range
+        // nonzero operands.
+        assert_eq!(tower_unary("inv", 1, 8), F2_8(1).inv().0 as u128);
+        assert_eq!(tower_unary("square", 5, 8), F2_8(5).square().0 as u128);
+    }
 }
