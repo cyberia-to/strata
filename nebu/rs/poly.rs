@@ -39,12 +39,12 @@ use crate::field::Goldilocks;
 ///
 /// Allocation-free: only stack frames proportional to `point.len()`.
 pub fn multilinear_eval(evals: &[Goldilocks], point: &[Goldilocks]) -> Goldilocks {
-    debug_assert_eq!(
+    assert_eq!(
         evals.len(),
         1usize << point.len(),
         "evals.len() must equal 2^point.len()"
     );
-    debug_assert!(!evals.is_empty(), "evals must be non-empty");
+    assert!(!evals.is_empty(), "evals must be non-empty");
 
     if point.is_empty() {
         return evals[0];
@@ -131,5 +131,30 @@ mod tests {
         let result = multilinear_eval(&evals, &[g(0), g(2)]);
         // vl = 10+2*10=30; vr = 30+2*10=50; out = 30 + 0*(50-30) = 30
         assert_eq!(result, g(30));
+    }
+
+    // The length invariant used to be a debug_assert, compiled out in
+    // release, so a mismatch silently recursed on the wrong midpoint
+    // instead of panicking as the doc comment promises.
+
+    #[test]
+    #[should_panic]
+    fn mismatched_length_too_few_evals_panics() {
+        let evals = [g(1), g(2)];
+        multilinear_eval(&evals, &[g(0), g(0)]);
+    }
+
+    #[test]
+    #[should_panic]
+    fn mismatched_length_too_many_evals_panics() {
+        let evals = [g(1), g(2), g(3), g(4), g(5), g(6), g(7), g(8)];
+        multilinear_eval(&evals, &[g(0)]);
+    }
+
+    #[test]
+    #[should_panic]
+    fn empty_evals_with_nonempty_point_panics() {
+        let evals: [Goldilocks; 0] = [];
+        multilinear_eval(&evals, &[g(0)]);
     }
 }
