@@ -15,7 +15,7 @@
 //! alongside this one, so no lookup beyond our own directory.
 
 use std::io::IsTerminal;
-use std::process::{exit, Command};
+use std::process::{Command, exit};
 
 const ALGEBRAS: &[(&str, &str)] = &[
     ("nebu", "Goldilocks field 𝔽ₚ arithmetic"),
@@ -29,7 +29,11 @@ fn tty() -> bool {
     std::io::stdout().is_terminal()
 }
 fn paint(code: &str, s: &str) -> String {
-    if tty() { format!("\x1b[{code}m{s}\x1b[0m") } else { s.to_string() }
+    if tty() {
+        format!("\x1b[{code}m{s}\x1b[0m")
+    } else {
+        s.to_string()
+    }
 }
 fn dim(s: &str) -> String {
     paint("90", s)
