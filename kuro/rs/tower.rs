@@ -42,7 +42,7 @@ impl F2 {
 
     #[inline(always)]
     pub fn inv(self) -> Self {
-        debug_assert!(self.0 == 1, "inverse of zero");
+        assert!(self.0 == 1, "inverse of zero");
         self
     }
 
@@ -110,7 +110,7 @@ impl F2_2 {
     }
 
     pub fn inv(self) -> Self {
-        debug_assert!(self.0 != 0, "inverse of zero");
+        assert!(self.0 != 0, "inverse of zero");
         // |F₂²*| = 3, so a⁻¹ = a^(3-1) = a²
         self.square()
     }
@@ -267,7 +267,7 @@ macro_rules! tower_level {
             ///   Δ = a_lo·(a_lo + a_hi) + a_hi²·α
             ///   a⁻¹ = Δ⁻¹·(a_lo + a_hi) + Δ⁻¹·a_hi·x
             pub fn inv(self) -> Self {
-                debug_assert!(self.0 != 0, "inverse of zero");
+                assert!(self.0 != 0, "inverse of zero");
                 let a_lo = self.lo();
                 let a_hi = self.hi();
 
@@ -329,3 +329,89 @@ tower_level!(
     0x0000_0000_0000_0000_FFFF_FFFF_FFFF_FFFFu128,
     0x8000_0000_0000_0000
 ); // α = x₀···x₅
+
+// ---------------------------------------------------------------------------
+// Tests
+// ---------------------------------------------------------------------------
+//
+// `inv()`'s zero-check was only a `debug_assert!`, compiled out in release
+// (the profile `kuro-cli` and every downstream caller of the raw, unchecked
+// `inv()` actually ships). At every level, `inv(0)` silently returned `0`
+// instead of failing: the base `F2`/`F2_2` cases return `self` (already
+// zero) or `square(0) == 0`; each tower level then reduces to the same
+// silent zero through its own recursive `delta.inv()` call. `checked_inv_*`
+// in `inv.rs` already guards every call it makes with `is_zero()` first —
+// these are regressions on the raw `inv()` a caller can still reach
+// directly, closing the gap pre-emptively, same framing as rows
+// 77/80/81/82/85/86/90/93/99/108/117/118/120/125/126/128/130/131/139/151/
+// 167/174/232/233/241 elsewhere in this codebase.
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    #[should_panic(expected = "inverse of zero")]
+    fn f2_inv_zero_panics() {
+        F2::ZERO.inv();
+    }
+
+    #[test]
+    #[should_panic(expected = "inverse of zero")]
+    fn f2_2_inv_zero_panics() {
+        F2_2::ZERO.inv();
+    }
+
+    #[test]
+    #[should_panic(expected = "inverse of zero")]
+    fn f2_4_inv_zero_panics() {
+        F2_4::ZERO.inv();
+    }
+
+    #[test]
+    #[should_panic(expected = "inverse of zero")]
+    fn f2_8_inv_zero_panics() {
+        F2_8::ZERO.inv();
+    }
+
+    #[test]
+    #[should_panic(expected = "inverse of zero")]
+    fn f2_16_inv_zero_panics() {
+        F2_16::ZERO.inv();
+    }
+
+    #[test]
+    #[should_panic(expected = "inverse of zero")]
+    fn f2_32_inv_zero_panics() {
+        F2_32::ZERO.inv();
+    }
+
+    #[test]
+    #[should_panic(expected = "inverse of zero")]
+    fn f2_64_inv_zero_panics() {
+        F2_64::ZERO.inv();
+    }
+
+    #[test]
+    #[should_panic(expected = "inverse of zero")]
+    fn f2_128_inv_zero_panics() {
+        F2_128::ZERO.inv();
+    }
+
+    // Correctness on non-zero inputs is unchanged: a * a.inv() == ONE.
+    #[test]
+    fn inv_is_multiplicative_inverse_on_nonzero() {
+        assert_eq!(F2::ONE.inv(), F2::ONE);
+        assert_eq!(F2_2::ONE.mul(F2_2::ONE.inv()), F2_2::ONE);
+        assert_eq!(F2_4(5).mul(F2_4(5).inv()), F2_4::ONE);
+        assert_eq!(F2_8(200).mul(F2_8(200).inv()), F2_8::ONE);
+        assert_eq!(F2_16(4321).mul(F2_16(4321).inv()), F2_16::ONE);
+        assert_eq!(F2_32(123_456_789).mul(F2_32(123_456_789).inv()), F2_32::ONE);
+        assert_eq!(F2_64(0x1234_5678_9abc_def1).mul(F2_64(0x1234_5678_9abc_def1).inv()), F2_64::ONE);
+        assert_eq!(
+            F2_128(0x1234_5678_9abc_def1_0011_2233_4455_6677).mul(
+                F2_128(0x1234_5678_9abc_def1_0011_2233_4455_6677).inv()
+            ),
+            F2_128::ONE
+        );
+    }
+}
