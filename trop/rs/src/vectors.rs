@@ -781,3 +781,32 @@ fn integration_determinant_permutation_matrix() {
     m.set(2, 0, Tropical::from_u64(0));
     assert_eq!(determinant(&m), Tropical::from_u64(0));
 }
+
+// `get`/`set` bound-check `i < n && j < n` against the *logical* dimension,
+// but `data` is a fixed MAX_DIM x MAX_DIM array — an index within
+// `[n, MAX_DIM)` is still in range for `data` itself. Before this fix the
+// check was `debug_assert!`, compiled out in release, so an out-of-range
+// index silently read/wrote a slot outside the logical submatrix instead
+// of failing at the point of the bug (same class as the zheng/foculus/tru
+// debug_assert-in-release rows across this launch).
+
+#[test]
+#[should_panic(expected = "out of bounds")]
+fn get_panics_on_index_within_max_dim_but_past_n() {
+    let m = TropMatrix::new(2);
+    let _ = m.get(2, 0); // 2 < MAX_DIM (64) but >= n (2)
+}
+
+#[test]
+#[should_panic(expected = "out of bounds")]
+fn set_panics_on_index_within_max_dim_but_past_n() {
+    let mut m = TropMatrix::new(2);
+    m.set(0, 5, Tropical::ONE); // 5 < MAX_DIM (64) but >= n (2)
+}
+
+#[test]
+fn get_set_roundtrip_within_bounds() {
+    let mut m = TropMatrix::new(3);
+    m.set(2, 2, Tropical::from_u64(7));
+    assert_eq!(m.get(2, 2), Tropical::from_u64(7));
+}
