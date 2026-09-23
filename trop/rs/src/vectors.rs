@@ -356,6 +356,37 @@ fn matrix_from_weights_duplicate_takes_min() {
 }
 
 #[test]
+#[should_panic]
+fn matrix_get_row_out_of_declared_dimension_panics() {
+    // n=2 but MAX_DIM=64: index 5 is within the flat backing array but
+    // outside the matrix's declared dimension.
+    let m = TropMatrix::new(2);
+    m.get(5, 0);
+}
+
+#[test]
+#[should_panic]
+fn matrix_get_col_out_of_declared_dimension_panics() {
+    let m = TropMatrix::new(2);
+    m.get(0, 5);
+}
+
+#[test]
+#[should_panic]
+fn matrix_set_out_of_declared_dimension_panics() {
+    let mut m = TropMatrix::new(2);
+    m.set(5, 5, Tropical::from_u64(1));
+}
+
+#[test]
+#[should_panic]
+fn matrix_from_weights_index_past_declared_dimension_panics() {
+    // A malformed edge list with an index past n must fail loudly, not
+    // silently write into an unused slot of the fixed-size backing array.
+    TropMatrix::from_weights(2, &[(0, 1, 5), (9, 0, 3)]);
+}
+
+#[test]
 fn matrix_add_zero() {
     let mut a = TropMatrix::new(2);
     a.set(0, 0, Tropical::from_u64(3));

@@ -51,16 +51,22 @@ impl TropMatrix {
     }
 
     /// Get the element at (i, j).
+    ///
+    /// # Panics
+    /// Panics if `i >= n` or `j >= n`.
     #[inline]
     pub fn get(&self, i: usize, j: usize) -> Tropical {
-        debug_assert!(i < self.n && j < self.n);
+        assert!(i < self.n && j < self.n, "index ({i}, {j}) out of bounds for {0}x{0} matrix", self.n);
         self.data[i * MAX_DIM + j]
     }
 
     /// Set the element at (i, j).
+    ///
+    /// # Panics
+    /// Panics if `i >= n` or `j >= n`.
     #[inline]
     pub fn set(&mut self, i: usize, j: usize, val: Tropical) {
-        debug_assert!(i < self.n && j < self.n);
+        assert!(i < self.n && j < self.n, "index ({i}, {j}) out of bounds for {0}x{0} matrix", self.n);
         self.data[i * MAX_DIM + j] = val;
     }
 
