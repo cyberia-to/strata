@@ -94,7 +94,6 @@ the ring-aware approach (using jali's noise model):
 ```
 ring-aware: running accumulator, fold noise bound per step
             check once at bootstrapping boundary
-            ~30 field ops per fold step
 ```
 
 the savings come from tracking the noise bound algebraically rather than range-checking every coefficient independently. this is the noise-tracking analog of the 3072x savings from NTT-based ring multiplication.

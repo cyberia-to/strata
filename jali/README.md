@@ -74,7 +74,7 @@ n must be a power of 2 (NTT requirement) and must divide 2^32 (Goldilocks two-ad
 | noise tracking | bound estimation through ring operations |
 | convolution | native polynomial multiply = convolution |
 
-[[nox]] Layer 3 jets: `jet_ntt_batch`, `jet_key_switch`, `jet_gadget_decomp`, `jet_noise_track`, `jet_blind_rotate`. ring operations prove via PCS₃ (ring-aware [[Brakedown]] with NTT batching); HyperNova folds into the [[Goldilocks field|Goldilocks]] accumulator.
+[[nox]] Layer 3 jets: `jet_ntt_batch`, `jet_key_switch`, `jet_gadget_decomp`, `jet_noise_track`, `jet_blind_rotate`. ring operations prove through [[zheng]]; the ring-aware commitment and the fold of the retired design are withdrawn, and the repaired path lives in [[soft3/proposals/proof-system-repair|the proof-system repair]].
 
 ## structure
 

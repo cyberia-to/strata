@@ -59,7 +59,6 @@ generic:     64 constraints per coefficient per operation (range check)
 
 ring-aware:  running accumulator, fold noise bound per step
              check once at bootstrapping boundary
-             ~30 field ops per fold
 ```
 
 ## dependencies
