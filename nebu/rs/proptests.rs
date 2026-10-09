@@ -140,3 +140,35 @@ mod tests {
         }
     }
 }
+
+#[cfg(test)]
+mod dot_regression {
+    extern crate alloc;
+    use crate::Goldilocks;
+    use alloc::{vec, vec::Vec};
+    use strata_proof::Dot;
+
+    /// The former dot accumulated unreduced products in a u128 and wrapped
+    /// at the second term; it disagreed with the naive sum on random inputs.
+    #[test]
+    fn dot_equals_the_naive_sum() {
+        let mut s = 0x9e37_79b9_7f4a_7c15u64;
+        let mut next = || {
+            s ^= s << 13;
+            s ^= s >> 7;
+            s ^= s << 17;
+            Goldilocks::new(s).canonicalize()
+        };
+        for len in [0usize, 1, 2, 3, 4, 17, 1000] {
+            for _ in 0..200 {
+                let a: Vec<_> = (0..len).map(|_| next()).collect();
+                let b: Vec<_> = (0..len).map(|_| next()).collect();
+                let naive = a.iter().zip(&b).fold(Goldilocks::ZERO, |acc, (&x, &y)| acc + x * y);
+                assert_eq!(<Goldilocks as Dot>::dot(&a, &b), naive, "len {len}");
+            }
+        }
+        let max = Goldilocks::new(crate::field::P - 1);
+        let v = vec![max; 4];
+        assert_eq!(<Goldilocks as Dot>::dot(&v, &v), Goldilocks::new(4));
+    }
+}
