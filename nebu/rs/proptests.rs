@@ -8,7 +8,7 @@
 mod tests {
     use crate::field::{Goldilocks, P};
     use proptest::prelude::*;
-    use strata_core::{Codec, Field, Semiring};
+    use strata_core::{Codec, Field};
     use strata_proof::Reduce;
 
     /// strategy: random canonical Goldilocks element in [0, p)
