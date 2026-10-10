@@ -190,7 +190,8 @@ fn fp3_norm(x: Fp3) -> vec2<u32> {
     let c1c2 = gl_mul(x.c1.x, x.c1.y, x.c2.x, x.c2.y);
     let c0c1c2 = gl_mul(c0c1.x, c0c1.y, x.c2.x, x.c2.y);
     let three_c0c1c2 = gl_mul_small(c0c1c2.x, c0c1c2.y, 3u);
-    let two_c02_c2 = gl_double(gl_mul(c0_2.x, c0_2.y, x.c2.x, x.c2.y));
+    let c02_c2 = gl_mul(c0_2.x, c0_2.y, x.c2.x, x.c2.y);
+    let two_c02_c2 = gl_double(c02_c2.x, c02_c2.y);
     let c0_c22 = gl_mul(x.c0.x, x.c0.y, c2_2.x, c2_2.y);
     let c1_c22 = gl_mul(x.c1.x, x.c1.y, c2_2.x, c2_2.y);
     let c0_c12 = gl_mul(x.c0.x, x.c0.y, c1_2.x, c1_2.y);
@@ -219,7 +220,8 @@ fn fp3_inv(x: Fp3) -> Fp3 {
     let c1c2 = gl_mul(x.c1.x, x.c1.y, x.c2.x, x.c2.y);
 
     // r0 = c0² + 2·c0·c2 - c1² - c1·c2 + c2²
-    var r0 = gl_add(c0_2.x, c0_2.y, gl_double(c0c2).x, gl_double(c0c2).y);
+    let two_c0c2 = gl_double(c0c2.x, c0c2.y);
+    var r0 = gl_add(c0_2.x, c0_2.y, two_c0c2.x, two_c0c2.y);
     r0 = gl_sub(r0.x, r0.y, c1_2.x, c1_2.y);
     r0 = gl_sub(r0.x, r0.y, c1c2.x, c1c2.y);
     r0 = gl_add(r0.x, r0.y, c2_2.x, c2_2.y);
