@@ -810,3 +810,11 @@ fn get_set_roundtrip_within_bounds() {
     m.set(2, 2, Tropical::from_u64(7));
     assert_eq!(m.get(2, 2), Tropical::from_u64(7));
 }
+
+#[test]
+#[should_panic(expected = "out of bounds")]
+fn from_weights_panics_on_edge_index_past_n() {
+    // A malformed edge list with an index past n must fail loudly, not
+    // silently write into an unused slot of the fixed-size backing array.
+    let _ = TropMatrix::from_weights(2, &[(0, 1, 5), (9, 0, 3)]);
+}
