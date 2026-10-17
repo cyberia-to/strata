@@ -305,7 +305,24 @@ fn gpu_unary(ctx: &Ctx, op: &str, a: u128, level: u32) -> u128 {
 
 // -- CPU tower ops -----------------------------------------------------------
 
+/// True when truncating `a` down to `level` bits — the `$val as _` cast
+/// `tower_unary`'s `run!` macro applies before constructing the field
+/// element — collapses a nonzero `a` to zero. `cmd_calc`'s `a == 0` guard
+/// runs on the untruncated `u128` and cannot see this: an `a` whose low
+/// `level` bits are all zero but whose higher bits are set (e.g.
+/// `0x1_0000_0000` at `--level 32`) passes that guard yet still reaches
+/// `inv()` on the zero element of the target field.
+fn truncates_to_zero(a: u128, level: u32) -> bool {
+    let mask: u128 = if level >= 128 { u128::MAX } else { (1u128 << level) - 1 };
+    a != 0 && (a & mask) == 0
+}
+
 fn tower_unary(op: &str, a: u128, level: u32) -> u128 {
+    if op == "inv" && truncates_to_zero(a, level) {
+        die(&format!(
+            "error: inverse of zero is undefined ({a:#x} truncates to zero at --level {level})"
+        ));
+    }
     macro_rules! run {
         ($ty:ident, $val:expr) => {{
             let x = $ty($val as _);
@@ -415,26 +432,34 @@ fn cmd_calc(forced: Option<Backend>, args: &[String]) {
     }
 }
 
+fn try_encode_hex(raw: &str) -> Result<(String, Vec<u8>), String> {
+    let input = raw
+        .strip_prefix("0x")
+        .or_else(|| raw.strip_prefix("0X"))
+        .unwrap_or(raw);
+    if !input.is_ascii() {
+        return Err("hex string must be ASCII".to_string());
+    }
+    if input.len() % 2 != 0 {
+        return Err("hex string must have even length".to_string());
+    }
+    let bytes = (0..input.len())
+        .step_by(2)
+        .map(|i| {
+            u8::from_str_radix(&input[i..i + 2], 16)
+                .map_err(|e| format!("invalid hex byte '{}': {e}", &input[i..i + 2]))
+        })
+        .collect::<Result<Vec<u8>, String>>()?;
+    Ok((input.to_lowercase(), bytes))
+}
+
 fn cmd_encode(args: &[String]) {
     if args.is_empty() {
         die("usage: kuro encode <hex_bytes>\n  hex_bytes: even-length hex string");
     }
-    let input = args[0]
-        .strip_prefix("0x")
-        .or_else(|| args[0].strip_prefix("0X"))
-        .unwrap_or(&args[0]);
-    if input.len() % 2 != 0 {
-        die("error: hex string must have even length");
-    }
-    let bytes: Vec<u8> = (0..input.len())
-        .step_by(2)
-        .map(|i| {
-            u8::from_str_radix(&input[i..i + 2], 16)
-                .unwrap_or_else(|e| die(&format!("invalid hex byte '{}': {e}", &input[i..i + 2])))
-        })
-        .collect();
+    let (input, bytes) = try_encode_hex(&args[0]).unwrap_or_else(|e| die(&format!("error: {e}")));
 
-    println!("input: {} ({} bytes)", input.to_lowercase(), bytes.len());
+    println!("input: {input} ({} bytes)", bytes.len());
     for (i, chunk) in bytes.chunks(16).enumerate() {
         let mut val: u128 = 0;
         for (j, &b) in chunk.iter().enumerate() {
@@ -614,4 +639,93 @@ fn bench_op<F: Fn() -> T, T>(label: &str, iters: u64, f: F) {
     }
     let ns = t.elapsed().as_nanos() as f64 / iters as f64;
     println!("  {label}  {ns:>8.1} ns/op");
+}
+
+#[cfg(test)]
+mod try_encode_hex_tests {
+    use super::*;
+
+    #[test]
+    fn rejects_non_ascii_without_panicking() {
+        // "aébbb" is 6 bytes (a=1, é=2, b=1, b=1, b=1): the even-length
+        // guard does not catch it, but stepping by 2 lands a `&s[i..i+2]`
+        // slice boundary at byte index 2, inside é's 2-byte encoding.
+        // try_encode_hex must error, not panic.
+        assert!(try_encode_hex("aébbb").is_err());
+    }
+
+    #[test]
+    fn accepts_valid_hex_with_and_without_prefix() {
+        let (input, bytes) = try_encode_hex("0x00Ff").unwrap();
+        assert_eq!(bytes, vec![0x00, 0xff]);
+        assert_eq!(input, "00ff");
+        let (_, bytes) = try_encode_hex("00ff").unwrap();
+        assert_eq!(bytes, vec![0x00, 0xff]);
+    }
+
+    #[test]
+    fn rejects_odd_length() {
+        assert!(try_encode_hex("abc").is_err());
+    }
+
+    #[test]
+    fn rejects_invalid_hex_digit() {
+        assert!(try_encode_hex("zz").is_err());
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn zero_is_zero_at_every_level() {
+        for &level in &[2, 4, 8, 16, 32, 64, 128] {
+            assert!(!truncates_to_zero(0, level), "0 itself is caught by the a == 0 guard, not this one");
+        }
+    }
+
+    #[test]
+    fn nonzero_low_bits_never_truncate_to_zero() {
+        for &level in &[2, 4, 8, 16, 32, 64, 128] {
+            assert!(!truncates_to_zero(1, level));
+        }
+    }
+
+    #[test]
+    fn high_bits_only_truncate_to_zero_below_the_bit_they_set() {
+        // 0x1_0000_0000 has bit 32 set, bits 0..32 all zero: truncating to
+        // any level <= 32 bits keeps only zero bits, but level 64/128 keep
+        // bit 32 itself, so the value survives truncation there.
+        let a = 1u128 << 32;
+        for &level in &[2, 4, 8, 16, 32] {
+            assert!(truncates_to_zero(a, level), "level {level} should truncate {a:#x} to zero");
+        }
+        for &level in &[64, 128] {
+            assert!(!truncates_to_zero(a, level), "level {level} should not truncate {a:#x} to zero");
+        }
+    }
+
+    #[test]
+    fn full_width_value_never_truncates_to_zero_at_128() {
+        assert!(!truncates_to_zero(u128::MAX, 128));
+    }
+
+    #[test]
+    fn value_within_level_width_never_truncates_to_zero() {
+        // A value that already fits within `level` bits and is nonzero
+        // survives truncation unchanged, so it must never be flagged.
+        for &level in &[2, 4, 8, 16, 32, 64] {
+            let max_in_level = (1u128 << level) - 1;
+            assert!(!truncates_to_zero(max_in_level, level));
+        }
+    }
+
+    #[test]
+    fn tower_unary_inv_unaffected_for_non_truncating_input() {
+        // Regression: the new guard must not reject ordinary in-range
+        // nonzero operands.
+        assert_eq!(tower_unary("inv", 1, 8), F2_8(1).inv().0 as u128);
+        assert_eq!(tower_unary("square", 5, 8), F2_8(5).square().0 as u128);
+    }
 }
