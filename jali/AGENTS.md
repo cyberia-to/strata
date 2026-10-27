@@ -1,4 +1,6 @@
-# agent collaboration
+# AGENTS.md — strata/jali
+
+> the doctrine of the home is `~/cyber/AGENTS.md`; it applies here first. Claude Code receives both files at session start through `~/.config/cyber/agents-md.nu`; other agents read them in order.
 
 jali (जाली) — polynomial ring arithmetic R_q = F_p[x]/(x^n+1) over Goldilocks.
 
